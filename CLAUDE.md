@@ -3,7 +3,9 @@
 Operating manual for the **Bayanluma 1 Elementary School Portal** (`bl1es-portal`).
 Auto-loaded into every Claude Code session — keep it short and enforceable. Deeper rationale lives in `plan/`.
 
-> **Status:** Planning phase. Nothing is scaffolded yet. Items marked _(open)_ are still being decided in `plan/technical-approach.md`.
+> **Status:** Iteration-1 planning complete (Kindergarten pilot). The app is scaffolded; the six
+> iteration-1 specs live in `specs/` and the phased plan in `plan/roadmap.md`. Next phase:
+> implementation (stand up Supabase + Netlify, then build starting with Auth & core entities).
 
 ## What this is
 
@@ -27,11 +29,14 @@ A web portal for a single public elementary school (DepEd, Philippines) serving 
 
 - **Backend:** Supabase (Postgres + Auth + Row-Level Security)
 - **Hosting:** Netlify (free tier)
-- **Source control:** GitHub — PRs created/merged from Claude Code once tooling is wired up
+- **Source control:** GitHub — connected via the `gh` CLI; PRs created/merged from Claude Code per
+  the `git-workflow` skill. (Supabase + Netlify are not stood up yet.)
 
-## UI components _(open)_
+## UI components
 
-Recommended: **shadcn/ui** (Radix + Tailwind, self-owned, themeable via CSS variables). Pending final confirmation alongside the design palette.
+**shadcn/ui** (Radix + Tailwind, self-owned, themeable via CSS variables) — installed and in use.
+Primitives live in `src/components/ui/` (treat as owned); theme tokens (palette, fonts) are in
+`src/styles/globals.css`, per the design system.
 
 ## Design
 
@@ -145,7 +150,7 @@ export function useLogin() {
 ## Repository map
 
 - `CLAUDE.md` — this file; the always-loaded operating manual.
-- `plan/` — technical approach (Part 1) + point-in-time implementation plans.
+- `plan/` — `roadmap.md` (phased plan + deferred pipeline) + point-in-time implementation plans.
 - `specs/` — business rules and API contracts (Part 2). Living docs.
 - `design-system/` — palette, design tokens, typography, component conventions.
 - `.claude/skills/` — project-scoped skills.
@@ -156,8 +161,7 @@ export function useLogin() {
 - **Prefer free / open-source tools** — this is a personal project.
 - Push back with better ideas when you have them; don't agree by default.
 
-## Conventions _(expanding)_
+## Conventions
 
-Project structure and API layer conventions are above. Remaining conventions (naming, test
-placement, commit/PR rules) will be finalized in `plan/technical-approach.md` and distilled here as
-they solidify.
+Project structure and API layer conventions are above. Git workflow (branch → commit → PR → merge)
+is defined in the `git-workflow` skill. Further conventions are distilled here as they solidify.
