@@ -1,9 +1,9 @@
 ---
-name: gitmerge
-description: Use when committing changes or merging a feature branch into dev in the bl1es-portal repo.
+name: git-workflow
+description: Use when branching, committing, or merging a feature branch into dev in the bl1es-portal repo.
 ---
 
-# gitmerge
+# git-workflow
 
 ## Overview
 
@@ -20,6 +20,10 @@ commit per unit of work, rebase (never a merge commit) onto `dev`, PR into `dev`
   task. Implement and verify, then stop and wait for the go-ahead.
 
 ## Workflow
+
+0. **Always branch out from `dev`**, never from `main` or an arbitrary branch/commit. Before
+   creating a new working branch: `git checkout dev && git pull --ff-only`, then
+   `git checkout -b <branch>`.
 
 1. **Squash to a single commit.** If the branch has more than one commit ahead of `dev`,
    consolidate before doing anything else:
@@ -65,6 +69,7 @@ commit per unit of work, rebase (never a merge commit) onto `dev`, PR into `dev`
 
 | Step | Command |
 |---|---|
+| Branch | `git checkout dev && git pull --ff-only && git checkout -b <branch>` |
 | Squash | `git reset --soft $(git merge-base dev HEAD)` |
 | Rebase | `git fetch origin && git rebase origin/dev` |
 | Conflict | take dev's side (`--ours`), hand-reapply our change |
@@ -74,6 +79,8 @@ commit per unit of work, rebase (never a merge commit) onto `dev`, PR into `dev`
 
 ## Common mistakes
 
+- Branching from `main`, from the current branch without checking, or from a stale local `dev` —
+  always branch from a freshly pulled `dev`.
 - Opening a PR into `main` — never; `dev` is the only target.
 - Resolving conflicts by keeping our side wholesale — always start from dev's side, then reconcile.
 - Leaving multiple commits on the branch before pushing — squash first.
