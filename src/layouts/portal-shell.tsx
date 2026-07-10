@@ -13,6 +13,7 @@ import {
   Search,
   Menu,
   X,
+  Layers,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { BrandLogo } from '@/components/brand-logo'
@@ -29,13 +30,21 @@ const navItems = [
   { label: 'Settings', href: '/settings', icon: Settings },
 ]
 
+const managementNavItems = [
+  { label: 'Sections', href: '/management/sections', icon: Layers },
+]
+
 const ROLE_LABELS = {
   superadmin: 'Principal',
   admin: 'Teacher',
   normal: 'Student',
 } as const
 
-function SidebarContent({ pathname }: { pathname: string }) {
+function isNavItemActive(pathname: string, href: string) {
+  return href !== '#' && (pathname === href || pathname.startsWith(`${href}/`))
+}
+
+function SidebarContent({ pathname, isSuperadmin }: { pathname: string; isSuperadmin: boolean }) {
   const logout = useLogout()
 
   return (
@@ -44,9 +53,9 @@ function SidebarContent({ pathname }: { pathname: string }) {
         <BrandLogo />
       </Link>
 
-      <nav className="flex flex-1 flex-col gap-1">
+      <nav aria-label="Main navigation" className="flex flex-1 flex-col gap-1">
         {navItems.map((item) => {
-          const active = item.href !== '#' && pathname === item.href
+          const active = isNavItemActive(pathname, item.href)
           const Icon = item.icon
           return (
             <Link
@@ -65,6 +74,37 @@ function SidebarContent({ pathname }: { pathname: string }) {
             </Link>
           )
         })}
+
+        {isSuperadmin && (
+          <div role="group" aria-labelledby="management-nav-heading">
+            <p
+              id="management-nav-heading"
+              className="mt-4 px-3.5 text-xs font-extrabold uppercase tracking-wide text-muted-foreground"
+            >
+              Management
+            </p>
+            {managementNavItems.map((item) => {
+              const active = isNavItemActive(pathname, item.href)
+              const Icon = item.icon
+              return (
+                <Link
+                  key={item.label}
+                  to={item.href}
+                  aria-current={active ? 'page' : undefined}
+                  className={cn(
+                    'flex items-center gap-3 rounded-2xl px-3.5 py-2.5 text-sm font-bold transition-colors',
+                    active
+                      ? 'bg-primary text-primary-foreground shadow-sm'
+                      : 'text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground',
+                  )}
+                >
+                  <Icon className="size-5 shrink-0" />
+                  {item.label}
+                </Link>
+              )
+            })}
+          </div>
+        )}
       </nav>
 
       <div className="rounded-3xl bg-secondary/40 p-4">
@@ -109,12 +149,13 @@ export function PortalShell({
     ? `${profile.firstName.charAt(0)}${profile.lastName.charAt(0)}`.toUpperCase()
     : ''
   const roleLabel = profile ? ROLE_LABELS[profile.role] : ''
+  const isSuperadmin = profile?.role === 'superadmin'
 
   return (
     <div className="flex min-h-screen bg-background">
       {/* Desktop sidebar */}
       <aside className="sticky top-0 hidden h-screen w-72 shrink-0 border-r border-border bg-sidebar lg:block">
-        <SidebarContent pathname={pathname} />
+        <SidebarContent pathname={pathname} isSuperadmin={isSuperadmin} />
       </aside>
 
       {/* Mobile drawer */}
@@ -133,7 +174,7 @@ export function PortalShell({
             >
               <X className="size-5" />
             </button>
-            <SidebarContent pathname={pathname} />
+            <SidebarContent pathname={pathname} isSuperadmin={isSuperadmin} />
           </div>
         </div>
       )}

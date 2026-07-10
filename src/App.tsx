@@ -2,8 +2,11 @@ import { Routes, Route, Navigate } from 'react-router-dom'
 import LoginPage from '@/features/auth/pages/LoginPage'
 import DashboardPage from '@/features/dashboard/pages/DashboardPage'
 import SettingsPage from '@/features/settings/pages/SettingsPage'
+import SectionsListPage from '@/features/management/pages/SectionsListPage'
+import SectionDetailPage from '@/features/management/pages/SectionDetailPage'
 import { useAuth } from '@/features/auth/hooks/use-auth'
 import { RequireAuth } from '@/routes/require-auth'
+import { RequireSuperadmin } from '@/routes/require-superadmin'
 
 function App() {
   const { isAuthenticated, isLoading } = useAuth()
@@ -25,6 +28,10 @@ function App() {
       <Route element={<RequireAuth />}>
         <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/settings" element={<SettingsPage />} />
+        <Route element={<RequireSuperadmin />}>
+          <Route path="/management/sections" element={<SectionsListPage />} />
+          <Route path="/management/sections/:sectionId" element={<SectionDetailPage />} />
+        </Route>
       </Route>
     </Routes>
   )
