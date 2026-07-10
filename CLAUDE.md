@@ -21,7 +21,7 @@ A web portal for a single public elementary school (DepEd, Philippines) serving 
 - **UI:** React
 - **Styling:** Tailwind CSS; compose classNames with a `cn()` helper (`clsx` + `tailwind-merge`)
 - **Server state:** TanStack Query — do not hand-roll `fetch`-in-`useEffect` for server data
-- **HTTP client:** Axios (single shared instance — see API Layer below)
+- **Backend client:** Supabase JS (`@supabase/supabase-js`) — the single shared instance (see API Layer below)
 - **Architecture:** Single app, **role-based** access (teacher vs student/parent/guardian), **feature-oriented** folder structure
 - **Testing:** Vitest + React Testing Library
 
@@ -66,7 +66,7 @@ src/
                      routed content — distinct from components/, which holds non-shell UI
   hooks/             hooks shared across 2+ features
   lib/
-    api-client.ts    the single shared Axios instance (baseURL, interceptors)
+    supabase.ts      the single shared Supabase client (typed with generated Database)
     query-client.ts  TanStack Query client setup
     utils.ts         cn() and other framework-agnostic helpers
   routes/            route/router configuration, wiring feature pages together by role
@@ -84,31 +84,38 @@ second feature needs it, promote it to the matching top-level `src/` folder (`co
 Data flow is a strict one-way pipeline — never skip a layer:
 
 ```
-Component → React Query hook (feature/hooks) → API function (feature/api) → Axios instance (src/lib)
+Component → React Query hook (feature/hooks) → API function (feature/api) → Supabase client (src/lib/supabase.ts)
 ```
 
-- **`src/lib/api-client.ts`** — the *only* place Axios is instantiated. Base URL, headers,
-  interceptors (auth token attach, error normalization) live here. Nothing outside this file calls
-  `axios` directly.
-- **`features/<feature>/api/*.ts`** — one function per request. Typed request/response, calls the
-  shared Axios instance, throws/returns — no React or React Query in this layer.
+- **`src/lib/supabase.ts`** — the *only* place the Supabase client is created (URL + anon key,
+  typed with the generated `Database`). Nothing outside this file constructs a client.
+- **`features/<feature>/api/*.ts`** — one function per operation. Typed request/response, calls the
+  shared `supabase` client (queries, auth, storage, RPC, `functions.invoke`), returns/throws — no
+  React or React Query in this layer.
 - **`features/<feature>/hooks/*.ts`** — wraps an API function in `useQuery`/`useMutation`. This is
   the *only* layer components talk to for server data.
 
 ### Template — API function (`features/<feature>/api/get-profile.ts`)
 
 ```ts
-import { apiClient } from '@/lib/api-client';
+import { supabase } from '@/lib/supabase';
 
 export interface Profile {
   id: string;
-  role: 'teacher' | 'parent' | 'student';
+  role: 'superadmin' | 'admin' | 'normal';
   fullName: string;
 }
 
 export async function getProfile(): Promise<Profile> {
-  const { data } = await apiClient.get<Profile>('/profile');
-  return data;
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error('Not authenticated');
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('id, role, first_name, last_name')
+    .eq('id', user.id)
+    .single();
+  if (error) throw error;
+  return { id: data.id, role: data.role, fullName: `${data.first_name} ${data.last_name}` };
 }
 ```
 

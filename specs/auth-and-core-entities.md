@@ -41,6 +41,8 @@ auth.users ─1:1─ profiles
 - `id` (uuid, pk, fk→auth.users), `role` (enum: superadmin|admin|normal)
 - `first_name`, `last_name`, `profile_picture_url`
 - `username` (unique, nullable — set for staff, null for students)
+- `contact_email` (nullable) — staff's real email, for invite/reset/notification delivery (the auth
+  email is synthetic); null for students, who use `student_details.guardian_email`
 - `is_active` (bool, soft-delete flag), `created_at`, `updated_at`
 
 **`student_details`** — 1:1 with `profiles` where role = normal.
@@ -114,33 +116,40 @@ section with **no** explicit subject-teacher defaults to the adviser.
 
 ## Registration, onboarding & login
 
-Supabase Auth is email+password under the hood. The typed login identifier (username or student
-number) is resolved to the account's auth email on the client/edge, then `signInWithPassword`.
-**All roles onboard via an invite-link flow** — no initial password is ever generated or shown; the
-recipient always sets their own password from a one-time link.
+Supabase Auth is email/password under the hood, with **no native username login**. So every account's
+auth email is **synthesized from its login identifier** and resolved entirely client-side: staff →
+`{username}@staff.bl1es.portal`, students → `{student_number}@students.bl1es.portal`. The client
+formats the identifier into this email, then calls `signInWithPassword` — no lookup, no RPC, no
+account-enumeration surface.
+
+Because the auth email is synthetic (not a real inbox), Supabase can't send invite/reset emails
+natively. So **all onboarding and password-reset links are delivered to the person's real contact
+email via one custom Edge Function** (`profiles.contact_email` for staff,
+`student_details.guardian_email` for students). It's still an **invite-link** flow for everyone —
+the recipient sets their own password from a one-time link; we just deliver every link ourselves.
 
 **Account creation is two-phase:** first the identity/account is created; then teacher
 advisory/subject assignments or student section enrollment happen on separate Management screens.
 This mirrors real operations and fits the year-scoped model (identity is permanent; enrollment
 repeats each year).
 
-- **superadmin** — first account via **seed script** in Supabase; no public signup ever. Can create
-  additional superadmins in-app (principals change).
-- **admin (teacher)** — superadmin creates the identity (first/last name, email) → `username`
-  auto-suggested (`firstname.lastname`, numbered on collision, editable) → **Supabase native
-  invite** to that email → teacher sets own password → logs in with username. Advisory/subject
-  assignments are done separately (below).
+- **superadmin** — first account via **seed script** (admin API sets the synth email + password
+  directly); no public signup ever. Can create additional superadmins in-app.
+- **admin (teacher)** — superadmin creates the identity (first/last name, `contact_email`) →
+  `username` auto-suggested (`firstname.lastname`, numbered on collision, editable) → synth auth
+  email `{username}@staff.bl1es.portal` → one-time setup link delivered to `contact_email` → teacher
+  sets own password → logs in with username. Advisory/subject assignments are done separately (below).
 - **normal (student)** — superadmin creates the identity (first/last name, guardian name /
-  relationship / contact # / email, 4Ps flag) → `student_number` generated → auth account created
-  with a **synthesized unique email** `{student_number}@students.bl1es.portal` → **one-time setup
-  link delivered to `guardian_email`** → guardian/student sets password → logs in with student
-  number. Section enrollment is done separately (below).
+  relationship / contact # / email, 4Ps flag) → `student_number` generated → synth auth email
+  `{student_number}@students.bl1es.portal` → one-time setup link delivered to `guardian_email` →
+  guardian/student sets password → logs in with student number. Section enrollment is done separately
+  (below).
 
-**Why students differ:** Supabase's native invite/reset targets the account's auth email, but
-students have no real unique inbox (and siblings may share one guardian email, which would collide
-on Supabase's unique-email rule). So each student gets a synthesized unique auth email for
-login-by-number, while their setup/reset links are delivered to `guardian_email` via a custom send
-(Edge Function reusing the same email provider). Staff keep the clean native flow.
+**Why synthesized emails for everyone:** it enables username/number login with zero lookup and no
+enumeration surface, and sidesteps the unique-email collision when siblings share a guardian email.
+The trade-off is that we deliver all onboarding/reset links ourselves (one custom Edge Function)
+instead of using Supabase's built-in invite email — a marginal cost, since students needed custom
+delivery regardless, and it makes staff and students uniform.
 
 ### Enrollment & assignment (separate step — screens live in the Management sub-project)
 
@@ -151,8 +160,9 @@ login-by-number, while their setup/reset links are delivered to `guardian_email`
   access) and/or via **subject assignments** (that subject's records for a section). Any mix across
   sections is allowed.
 
-**Password reset:** staff → Supabase native reset to real email. Students → reset link delivered to
-`guardian_email` (same custom channel as onboarding); superadmin can re-trigger it.
+**Password reset:** for all roles, the reset link is delivered to the real contact email
+(`contact_email` for staff, `guardian_email` for students) via the same custom Edge Function;
+superadmin can re-trigger it.
 
 ## Student number format
 
