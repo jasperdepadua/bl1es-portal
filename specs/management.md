@@ -54,10 +54,11 @@ touches people and sections far more than structure, so the menu leads with thos
     (`subject_assignments`). Sparse/empty for Kinder.
 
 ### Teachers
-- **List:** name, email, username, adviser-of (sections), subjects taught, active.
-- **Register (identity only):** first/last name, email → creates account, auto-suggests `username`,
-  sends **Supabase native invite**. Assignments happen on Section pages, not here.
-- **Edit:** name, email. **Deactivate:** soft — preserves historical records/assignments.
+- **List:** name, contact email, username, adviser-of (sections), subjects taught, active.
+- **Register (identity only):** first/last name, `contact_email` → generates `username`, creates
+  account with a synthesized auth email (`{username}@staff.bl1es.portal`), sends a **custom invite
+  link to `contact_email`**. Assignments happen on Section pages, not here.
+- **Edit:** name, contact email. **Deactivate:** soft — preserves historical records/assignments.
 
 ### Students
 - **List:** name, student number, current-year section, guardian, active. Filter by grade/section/year.
