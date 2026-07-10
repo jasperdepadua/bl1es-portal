@@ -1,13 +1,15 @@
-import { Button } from '@/components/ui/button'
+import { Routes, Route } from 'react-router-dom'
+import LoginPage from '@/features/auth/pages/LoginPage'
+import DashboardPage from '@/features/dashboard/pages/DashboardPage'
+import SettingsPage from '@/features/settings/pages/SettingsPage'
 
 function App() {
   return (
-    <div className="flex min-h-svh flex-col items-center justify-center gap-4">
-      <h1 className="text-2xl font-semibold text-foreground">
-        Bayanluma 1 Elementary School Portal
-      </h1>
-      <Button>Get started</Button>
-    </div>
+    <Routes>
+      <Route path="/" element={<LoginPage />} />
+      <Route path="/dashboard" element={<DashboardPage />} />
+      <Route path="/settings" element={<SettingsPage />} />
+    </Routes>
   )
 }
 
