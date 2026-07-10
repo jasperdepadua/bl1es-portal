@@ -22,7 +22,7 @@ export function BrandLogo({
           </p>
           {subtitle && (
             <p className="text-xs font-semibold text-muted-foreground">
-              Bayanluma 1 Elementary
+              Bayanluma 1 Elementary School
             </p>
           )}
         </div>

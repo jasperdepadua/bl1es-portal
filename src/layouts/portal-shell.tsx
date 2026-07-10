@@ -100,7 +100,7 @@ function SidebarContent({ pathname, isSuperadmin }: { pathname: string; isSupera
         className="flex cursor-pointer items-center gap-3 rounded-2xl px-3.5 py-2.5 text-left text-sm font-bold text-muted-foreground transition-colors hover:bg-accent/10 hover:text-accent"
       >
         <LogOut className="size-5" />
-        Log out
+        Sign out
       </button>
     </div>
   )
@@ -204,14 +204,17 @@ export function PortalShell({
           <button
             type="button"
             className="relative flex size-10 cursor-pointer items-center justify-center rounded-2xl border border-border bg-card text-foreground transition-colors hover:bg-muted"
-            aria-label="Notifications"
+            aria-label="Notifications, 1 unread"
           >
             <Bell className="size-5" />
             <span className="absolute right-2 top-2 size-2 rounded-full bg-accent" />
           </button>
 
           <div className="flex items-center gap-3">
-            <span className="flex size-10 items-center justify-center rounded-2xl bg-primary text-sm font-extrabold text-primary-foreground">
+            <span
+              aria-label={displayName}
+              className="flex size-10 items-center justify-center rounded-2xl bg-primary text-sm font-extrabold text-primary-foreground"
+            >
               {initials}
             </span>
             <div className="hidden leading-tight sm:block">

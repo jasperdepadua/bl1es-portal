@@ -110,7 +110,7 @@ function PickerDialog<T extends { id: string; name: string }>({
               type="search"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search by name..."
+              placeholder="Search by name…"
               className="h-11 w-full rounded-2xl border border-border bg-background pl-9 pr-3 text-sm font-medium text-foreground outline-none transition-all placeholder:text-muted-foreground focus:border-primary focus:ring-3 focus:ring-ring/30"
               aria-label="Search by name"
             />
@@ -269,7 +269,7 @@ function SectionDetailContent({
 
   return (
     <PortalShell
-      title="Section Detail"
+      title={`${section.gradeLevelName} – ${section.name}`}
       subtitle="Manage this section's roster, adviser, and subject teachers."
     >
       {/* Breadcrumb */}
@@ -399,9 +399,9 @@ function SectionDetailContent({
                   type="search"
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
-                  placeholder="Filter by student name..."
+                  placeholder="Search by name…"
                   className="h-11 w-full rounded-2xl border border-border bg-card pl-9 pr-3 text-sm font-medium text-foreground outline-none transition-all placeholder:text-muted-foreground focus:border-primary focus:ring-3 focus:ring-ring/30 sm:w-72"
-                  aria-label="Filter by student name"
+                  aria-label="Search by name"
                 />
               </div>
 
@@ -500,7 +500,7 @@ function SectionDetailContent({
                               onClick={() => setUnenrollTarget(s)}
                               className="inline-flex size-9 cursor-pointer items-center justify-center rounded-xl text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
                               aria-label={`Unenroll ${s.studentName}`}
-                              title="Unenroll student"
+                              title="Unenroll Student"
                             >
                               <UserMinus className="size-4" aria-hidden />
                             </button>
@@ -539,10 +539,10 @@ function SectionDetailContent({
                   <Initials name={section.adviserName ?? '?'} className="size-16 text-xl" />
                   <div className="leading-tight">
                     <p className="font-display text-xl font-extrabold text-foreground">
-                      {section.adviserName ?? 'No adviser assigned'}
+                      {section.adviserName ?? 'Unassigned'}
                     </p>
                     <p className="mt-0.5 text-sm font-semibold text-muted-foreground">
-                      Section Adviser · {section.gradeLevelName} {section.name}
+                      Adviser · {section.gradeLevelName}–{section.name}
                     </p>
                     {section.adviserContactEmail && (
                       <a
@@ -598,7 +598,7 @@ function SectionDetailContent({
                 </span>
                 <div className="max-w-md">
                   <p className="font-display text-lg font-extrabold text-foreground">
-                    No discrete subjects for {section.gradeLevelName}
+                    No separate subjects for {section.gradeLevelName}
                   </p>
                   <p className="mt-1 text-sm font-medium text-muted-foreground">
                     This grade level uses an integrated curriculum, so all learning areas are
@@ -659,7 +659,7 @@ function SectionDetailContent({
       {enrollDialogOpen && (
         <PickerDialog
           title="Enroll Student"
-          description={`Add a registered student to ${section.name} for ${section.schoolYearLabel}.`}
+          description={`Enroll a registered student in ${section.name} for ${section.schoolYearLabel}.`}
           onClose={closeEnrollDialog}
           isLoading={enrollableStudentsQuery.isLoading}
           options={enrollableStudentsQuery.data ?? []}
@@ -724,7 +724,7 @@ function SectionDetailContent({
 
       {unenrollTarget && (
         <ConfirmDialog
-          title="Unenroll student?"
+          title="Unenroll Student?"
           description={`${unenrollTarget.studentName} will be removed from this section's roster. This can't be undone.`}
           confirmLabel="Unenroll"
           isPending={unenrollMutation.isPending}
