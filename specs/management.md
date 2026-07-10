@@ -79,6 +79,12 @@ Both the first-time setup flow and the implementation order:
 - **Bulk student import** (CSV) — v1 is single-entry registration.
 - **Year rollover / promotion** — the year-scoped model supports it; the workflow is deferred.
 - **Audit log** of management actions.
+- **Production email domain.** The invite/reset flow itself is v1 (Edge Function + `generateLink` +
+  emailing the link to `contact_email`/`guardian_email` — see `plan/2026-07-10-management.md`), not
+  deferred. What *is* deferred is the production sending domain: dev/testing sends through Mailtrap
+  Sandbox (free, no domain verification, captures mail in a dashboard instead of real inboxes);
+  going live with the real school needs a verified domain + real ESP (e.g. Resend) swapped in for
+  the same Edge Function — a config/secret change, not new code.
 
 ## Open questions
 

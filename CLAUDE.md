@@ -190,6 +190,7 @@ any sub-agent's):
 - `plan/` — `roadmap.md` (phased plan + deferred pipeline) + point-in-time implementation plans.
 - `specs/` — business rules and API contracts (Part 2). Living docs.
 - `design-system/` — palette, design tokens, typography, component conventions.
+- `docs/` — operational how-tos for local dev setup (e.g. the email-testing sandbox).
 - `.claude/skills/` — project-scoped skills.
 
 ## Working agreements

@@ -22,6 +22,15 @@ to you by the tech lead — no shortcuts, no guessed behavior, no compromises on
 - TypeScript strict. Match the surrounding code's style, naming, and idioms. Use shadcn/ui
   primitives from `src/components/ui/` — if one is missing, flag it rather than hand-rolling a
   divergent version.
+- **Tone scales with audience, same tokens everywhere** (see `design-system/README.md`): playful/
+  spacious for student/parent-facing screens, dense/efficient/professional for superadmin/teacher
+  operational screens. Never invent a different palette or component style for either register.
+- **`cursor-pointer` only where it's earned:** add it to a custom interactive element (a `<div>`/
+  `<li>` acting as a button or clickable card) that needs it, never blanket-applied to rows/containers
+  that merely contain an interactive child.
+- **Converting a v0 (or other external) mockup:** preserve the layout/IA, but re-home every color,
+  font, spacing, and component onto our existing tokens and `src/components/ui/` primitives — never
+  import a mockup's invented palette or one-off components as-is.
 - If what you're building touches auth, sessions/tokens, PII, or file uploads, run it against the
   `owasp-check` skill's checklist (`.claude/skills/owasp-check/SKILL.md`) before reporting done —
   data minimization (select only needed columns) and no logging of sensitive payloads apply to every
