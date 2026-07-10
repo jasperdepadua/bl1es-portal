@@ -123,9 +123,20 @@ Families," T2 "Exploring Our Community," T3 "Caring for Our Community and Our En
   Social-Emotional (24).
 - Descriptive ratings: SSDOD (Significant Delay), SSIDOD (Slight Delay), AD (Average
   Development), SSAD (Slightly Advanced), SHAD (Highly Advanced).
-- Progress Report Card uses **N** (Nagsisimula), **P** (Pagpapaunlad), **K** (Konsistent).
+- Progress Report Card: the deck renders the scale informally in Filipino (Nagsisimula / Pag-unlad /
+  Konsistent). **Verified against DO 015 (Table 7, p.10): the official scale is CO / DV / BG**
+  (Consistent / Developing / Beginning).
 - No formal academic awards for Key Stage 1 — certificates recognize effort/character milestones
   instead (consistent with the DepEd Order above).
+
+> **Verified (primary source) — two distinct instruments** (detailed in `assessment.md`):
+> 1. **Kindergarten Progress Report** (DO 015 Annex E) = the *grading* — a competency checklist over
+>    **4 curriculum domains** (Sensory-Motor, Socio-emotional, Cognitive, Language/Literacy), rated
+>    **CO/DV/BG per term (T1/T2/T3)**, with per-term teacher comments, parent signature, and a
+>    per-term/month attendance record.
+> 2. **ECCD Checklist** = the *developmental screening* — the **8 domains** listed above, bands
+>    SSDOD→SHAD, done baseline + endline; exact items/norms live in the *"Tracking Our Progress:
+>    Kindergarten!"* guide (DO 015 §42).
 
 ### Parent/guardian communication (pp. ~2, 21, 30-31)
 - Parents not allowed inside the classroom during class hours.

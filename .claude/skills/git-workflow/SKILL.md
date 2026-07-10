@@ -60,7 +60,8 @@ commit per unit of work, rebase (never a merge commit) onto `dev`, PR into `dev`
    gh pr create --base dev --head <branch> --title "<short message>" --body "<what/why, 1-3 bullets>"
    ```
 
-5. **Merge with rebase (linear history):**
+5. **Merge the PR with rebase — always.** Use rebase-merge only; **never** "Squash and merge" or
+   "Create a merge commit". Rebase-merge is what keeps `dev`'s history linear and clean.
    ```bash
    gh pr merge --rebase
    ```
@@ -87,3 +88,4 @@ commit per unit of work, rebase (never a merge commit) onto `dev`, PR into `dev`
 - Adding "Co-Authored-By: Claude" or similar to commit messages — omit entirely.
 - Using plain `git push --force` instead of `--force-with-lease` — lease protects against
   clobbering someone else's concurrent push.
+- Merging a PR with a merge commit or squash — always rebase-merge (`--rebase`) so `dev` stays linear.
