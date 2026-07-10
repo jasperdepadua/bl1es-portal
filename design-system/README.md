@@ -9,8 +9,11 @@ Source of truth lives in [`src/styles/globals.css`](../src/styles/globals.css) a
 
 - **Vibe:** warm, playful, rounded — elementary-school friendly.
 - **Fonts:** Nunito (body, `font-sans`) + Baloo 2 (headings, `font-display`/`font-heading`).
-- **Palette:** cream background (`#fff9f2`), sky blue primary (`#4f9dff`), sunny yellow secondary
-  (`#ffd166`), coral accent (`#ff6b6b`).
+- **Palette:** cream background (`#fff9f2`), sky blue primary (`#1b72de`), sunny yellow secondary
+  (`#ffd166`), coral accent (`#ff6b6b`). Primary was darkened from the original v0 value (`#4f9dff`,
+  2.76:1 with white — failed WCAG AA) to `#1b72de` (4.66:1) — same hue, slightly less saturated,
+  still reads as the same sky blue. `--ring`, `--chart-1`, `--sidebar-primary`, and `--sidebar-ring`
+  moved with it since they mirrored the same value.
 - **Radius:** `1rem` base (very rounded — cards, inputs, buttons all soft).
 - **Components:** shadcn/ui (Radix base) themed via the above CSS variables.
 - **Tone scales with audience, not with page.** Same tokens (palette/fonts/radius) everywhere, but
@@ -44,7 +47,10 @@ Source of truth lives in [`src/styles/globals.css`](../src/styles/globals.css) a
   these screens want), or formally bless the hand-rolled pattern here — either way, bake
   `cursor-pointer` into whichever wins so it stops being a per-component fix (Tailwind v4 Preflight
   doesn't add it to `<button>`).
-- **On-tint text contrast, app-wide.** `text-primary` on `bg-primary/10` and `text-muted-foreground`
-  on `bg-muted` both measure under WCAG AA (4.5:1) for small text, and both are used broadly (badges,
-  avatar initials, subtitles) across screens already shipped. Worth an app-wide pass once the
-  canonical-component question above is settled, rather than patching combo-by-combo.
+- **On-tint text contrast, app-wide.** `text-primary` on `bg-primary/10` improved from ~2.6:1 to
+  4.09:1 when `--primary` was darkened for the solid-fill fix above — clears the 3:1 floor (large
+  text/icons) but still short of 4.5:1 for small text. `text-muted-foreground` on `bg-muted` is
+  unaffected and still under AA. Both are used broadly (badges, avatar initials, subtitles) across
+  screens already shipped. Worth a dedicated pass (likely a `--primary-foreground`-on-tint token,
+  following the `--success-foreground` precedent) once the canonical-component question above is
+  settled, rather than patching combo-by-combo.

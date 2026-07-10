@@ -1,10 +1,13 @@
 # Design + Content Audit — full current UI surface
 
-> **Status:** Findings only, not yet triaged. Produced by `ui-ux-critic` (visual/interaction design)
-> and `content-reviewer` (copy/wording) scanning every shipped screen: `LoginPage`, `portal-shell`,
-> `DashboardPage`, `SettingsPage`, both Management pages, `brand-logo`, and the shadcn primitives.
-> The user reviews and marks a decision per finding (`Fix now` / `Defer` / `Won't fix`) — nothing
-> here is applied yet.
+> **Status:** Produced by `ui-ux-critic` (visual/interaction design) and `content-reviewer`
+> (copy/wording) scanning every shipped screen: `LoginPage`, `portal-shell`, `DashboardPage`,
+> `SettingsPage`, both Management pages, `brand-logo`, and the shadcn primitives. First triage pass
+> (`chore/ui-infra-cleanup`) resolved the shared-infrastructure items (`--primary` token contrast,
+> `portal-shell` nav/modal behavior) plus explicit cleanup requests (dead nav items, help-center
+> block, topbar search) — marked ✅ inline below. Everything else is still open for review; Dashboard/
+> Settings-*content*-specific findings are deliberately deferred until those sub-projects start,
+> since that code gets substantially rewritten with real data anyway.
 
 ---
 
@@ -12,22 +15,19 @@
 
 ### Blocking
 
-- **B1. White text on solid `--primary` (#4f9dff) = 2.76:1 — fails WCAG AA, token-level, app-wide.**
-  Every primary button/active-nav/avatar with white text/icon fails contrast, including the
-  Management buttons already reviewed once and the shipped `Button` `default` variant. Distinct
-  from (more severe than) the two on-tint contrast items already logged in
-  `design-system/README.md`. Fix candidates verified: `#1e6fe0` (4.77:1) or blue-600 `#2563eb`
-  (5.17:1) — or add a separate `--primary-strong` token for text-bearing surfaces and keep `#4f9dff`
-  for large decorative fills only.
-- **B2. Settings form inputs have no label association** (`SettingsPage.tsx` `Field` component +
-  About textarea) — zero `htmlFor`/`id` pairing app-wide in that file. Login does this correctly;
-  Settings regressed from it.
-- **B3. Topbar search has no accessible name** (`portal-shell.tsx` — placeholder only, no
-  `aria-label`). Management's own search inputs already do this correctly — inconsistent.
-- **B4. Mobile nav drawer has none of the mandated modal behavior** (`portal-shell.tsx`) — no focus
-  trap/initial-focus/Escape/scroll-lock/focus-restore/`role="dialog"`, despite being a modal-scrim
-  overlay. `useModalBehavior` (currently local to `SectionDetailPage.tsx`) should be promoted to a
-  shared hook now that a second surface needs it.
+- ✅ **RESOLVED — B1. White text on solid `--primary` (#4f9dff) = 2.76:1.** Darkened `--primary` to
+  `#1b72de` (4.66:1 with white — same hue, less saturated, still reads as sky blue). Mirrored to
+  `--ring`, `--chart-1`, `--sidebar-primary`, `--sidebar-ring`. As a side effect, the already-logged
+  `text-primary` on `bg-primary/10` on-tint case improved from ~2.6:1 to 4.09:1 (clears the 3:1
+  floor, still short of 4.5:1 for small text — that residual gap stays open, see `design-system/README.md`).
+- **B2. Settings form inputs have no label association** — still open (deferred; Settings content
+  is getting substantially rebuilt in its own sub-project).
+- ✅ **RESOLVED (moot) — B3. Topbar search has no accessible name.** The search box was removed
+  entirely per explicit request rather than fixed in place.
+- ✅ **RESOLVED — B4. Mobile nav drawer had none of the mandated modal behavior.** `useModalBehavior`
+  promoted to `src/hooks/use-modal-behavior.ts` (shared); the mobile drawer now uses it —
+  focus-to-first, Tab-trap, Escape-close, scroll-lock, focus-restore, `role="dialog"`/`aria-modal`
+  all verified working via keyboard simulation.
 
 ### Major
 
@@ -38,7 +38,10 @@
 - **M3.** Systemic missing `cursor-pointer` on native `<button>` across every *not-yet-reviewed*
   screen (Login, portal-shell, Dashboard, Settings — 19 buttons) plus the shipped `Button`
   primitive itself. Confirms the earlier recommendation: fix belongs in `buttonVariants`, not
-  per-component.
+  per-component. **Partially resolved:** `portal-shell.tsx`'s buttons (hamburger, drawer close,
+  notification, logout) now have it, since that file was already being rewritten for the nav
+  cleanup below. Login/Dashboard/Settings and the `Button` primitive are still open — deferred,
+  same reasoning as B2.
 - **M4.** Dashboard/Settings show hardcoded "Ms. Reyes" while the topbar (via real `useProfile`)
   shows the actual logged-in user — identity mismatch for any non-Reyes account.
 - **M5.** Dashboard has two stacked greeting blocks (topbar + a redundant welcome banner) —
@@ -51,7 +54,8 @@ cards; several dead/stub controls presenting as live (Remember me, Forgot passwo
 items, Settings Save); inconsistent tap-target sizes (28–40px vs. a 44px touch floor); three
 different "selected" visual languages (pill / solid-fill / underline) with no defined pattern; a
 phantom spacer `<div>` in Settings' grid; notification unread-state and mobile avatar not exposed to
-assistive tech; logout races an async mutation against a `<Link>` navigation. Full detail in the
+assistive tech; ~~logout races an async mutation against a `<Link>` navigation~~ (✅ **resolved** —
+now a `<button>` that awaits the mutation via `onSuccess` before navigating). Full detail in the
 agent's original report if needed — ask and I'll paste the rest.
 
 ### Design-system gaps to extend (not component-level fixes)
@@ -95,12 +99,13 @@ agent's original report if needed — ask and I'll paste the rest.
   everywhere else). Worth revisiting the spec, not just the label.
 - **7. "Grades" (nav + Settings) contradicts Kinder's actual descriptive, non-numeric "Progress
   Report"** per `specs/assessment.md`. Fix: rename to "Progress Report."
-- **8. `portal-shell`'s nav array doesn't reflect the spec'd IA at all** — flat, non-role-gated,
-  five of seven items are dead `href="#"` links to features not in any spec (My Classes, Schedule,
-  Assignments, Grades, Messages). Only "Management ▸ Sections" is real. Surfaced distinctly because
-  this file was treated as "already mature" going into the audit — it isn't, content-wise.
-- **9. Help-center copy isn't role-aware** — "Ask your teacher" renders identically for the
-  Principal role too.
+- ✅ **PARTIALLY RESOLVED — 8. `portal-shell`'s nav array didn't reflect the spec'd IA at all.** The
+  five dead `href="#"` items (My Classes, Schedule, Assignments, Grades, Messages) are removed —
+  nav is now Dashboard, Settings, Management ▸ Sections, all real. Still open: this isn't yet the
+  *full* spec'd per-role IA from `specs/navigation.md` (Attendance, Academics, Reports aren't built
+  yet) — that lands as each of those sub-projects ships, not as a content fix.
+- ✅ **RESOLVED (moot) — 9. Help-center copy isn't role-aware.** The whole "Need help?" block was
+  removed per explicit request rather than made role-aware.
 - **10. `SectionDetailPage`'s browser/page title is generic** ("Section Detail") despite the real
   section name being available and prominent two lines later.
 - **11. "Unassigned" vs. "No adviser assigned"** — same missing-adviser state, two different
