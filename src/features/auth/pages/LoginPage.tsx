@@ -14,14 +14,13 @@ import {
 } from 'lucide-react'
 import { BrandLogo } from '@/components/brand-logo'
 import { useLogin } from '@/features/auth/hooks/use-login'
+import type { LoginRole } from '@/features/auth/api/resolve-login-email'
 import { cn } from '@/lib/utils'
-
-type Role = 'student' | 'teacher'
 
 export default function LoginPage() {
   const navigate = useNavigate()
   const login = useLogin()
-  const [role, setRole] = useState<Role>('student')
+  const [role, setRole] = useState<LoginRole>('student')
   const [showPassword, setShowPassword] = useState(false)
   const [identifier, setIdentifier] = useState('')
   const [password, setPassword] = useState('')
@@ -29,7 +28,7 @@ export default function LoginPage() {
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     login.mutate(
-      { identifier, password },
+      { identifier, password, role },
       { onSuccess: () => navigate('/dashboard') },
     )
   }
@@ -122,7 +121,7 @@ export default function LoginPage() {
                 htmlFor="username"
                 className="text-sm font-bold text-foreground"
               >
-                {role === 'student' ? 'Student ID or Username' : 'Email address'}
+                {role === 'student' ? 'Student ID' : 'Username'}
               </label>
               <div className="relative">
                 <User className="pointer-events-none absolute left-3.5 top-1/2 size-5 -translate-y-1/2 text-muted-foreground" />
@@ -133,7 +132,7 @@ export default function LoginPage() {
                   value={identifier}
                   onChange={(e) => setIdentifier(e.target.value)}
                   placeholder={
-                    role === 'student' ? 'e.g. bl1es-2026-0142' : 'you@bl1es.edu.ph'
+                    role === 'student' ? 'e.g. bl1es-2026-0142' : 'e.g. maria.reyes'
                   }
                   className="h-12 w-full rounded-2xl border border-border bg-card pl-11 pr-4 text-sm font-medium text-foreground outline-none transition-all placeholder:text-muted-foreground/70 focus:border-primary focus:ring-3 focus:ring-ring/30"
                 />

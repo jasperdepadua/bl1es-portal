@@ -173,6 +173,16 @@ any sub-agent's):
   or secrets is reviewed by the repo owner before it lands, and run past the `code-reviewer` agent
   for privilege-escalation / secret-leak / injection.
 - **Don't roll your own auth or crypto.** Supabase Auth handles passwords, sessions, and tokens.
+- **Minimize what a request/response carries.** Select only the columns a screen needs (never
+  `select('*')`) — defense-in-depth on top of RLS, not a replacement for it. Sensitive data (passwords,
+  tokens) goes in POST/PUT bodies only, never a GET query string (query strings land in server/proxy
+  logs and browser history). Note: a request's own Payload/Response tab in the requester's own
+  DevTools is expected to show plaintext — that's normal for any HTTPS login and isn't a leak; HTTPS
+  is what protects it in transit.
+- **Never log sensitive data.** No `console.log`/error-tracking capture of full request/response
+  bodies or error objects that might embed a password or token.
+- **Edge Functions carrying tokens/links** (e.g. the onboarding/reset-link function) set
+  `Cache-Control: no-store` on their response.
 
 ## Repository map
 
@@ -187,6 +197,10 @@ any sub-agent's):
 - **Design before code.** Capture rules in `specs/`, plan in `plan/`, then implement.
 - **Prefer free / open-source tools** — this is a personal project.
 - Push back with better ideas when you have them; don't agree by default.
+- **Senior-professional bar, everywhere.** The tech lead and every sub-agent in `.claude/agents/`
+  operate at a professional, production-grade quality bar — no shortcuts, no guessed behavior. The
+  tech lead verifies every sub-agent's output (build/test/browser) before it lands; an agent
+  reporting "done" is never taken at face value.
 
 ## Conventions
 

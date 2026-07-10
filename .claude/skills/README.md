@@ -3,5 +3,6 @@
 Project-specific Claude Code skills for `bl1es-portal` live here, one directory per skill
 (`<skill-name>/SKILL.md`).
 
-None yet — these get added later (e.g. a spec-authoring skill, a component-scaffolding skill) once
-the project shape is clearer.
+- **`git-workflow`** — branching, committing, and landing a feature branch on `dev`.
+- **`owasp-check`** — OWASP-standards checklist for features/fixes touching sensitive data (auth,
+  PII, tokens, file uploads).
