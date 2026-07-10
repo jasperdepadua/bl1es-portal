@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import {
   ArrowLeft,
@@ -16,6 +16,7 @@ import {
 } from 'lucide-react'
 import { PortalShell } from '@/layouts/portal-shell'
 import { cn } from '@/lib/utils'
+import { useModalBehavior } from '@/hooks/use-modal-behavior'
 import { Badge } from '../components/badge'
 import { Initials } from '../components/initials'
 import { useSectionDetail } from '../hooks/use-section-detail'
@@ -41,50 +42,6 @@ const tabs: { key: TabKey; label: string; icon: typeof Users }[] = [
 
 // Stable empty-array reference so a still-loading roster doesn't defeat useMemo below.
 const EMPTY_ROSTER: RosterEntry[] = []
-
-const FOCUSABLE_SELECTOR =
-  'button:not(:disabled), [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-
-/**
- * Modal behavior for the plain-Tailwind dialogs below (no dialog primitive installed yet):
- * focuses the first control on open, traps Tab within the dialog, restores focus to the
- * trigger on close, locks background scroll, and closes on Escape.
- */
-function useModalBehavior(containerRef: React.RefObject<HTMLElement | null>, onClose: () => void) {
-  useEffect(() => {
-    const previouslyFocused = document.activeElement as HTMLElement | null
-    const firstFocusable = containerRef.current?.querySelector<HTMLElement>(FOCUSABLE_SELECTOR)
-    firstFocusable?.focus()
-
-    const originalOverflow = document.body.style.overflow
-    document.body.style.overflow = 'hidden'
-
-    function handleKeyDown(e: KeyboardEvent) {
-      if (e.key === 'Escape') {
-        onClose()
-        return
-      }
-      if (e.key !== 'Tab' || !containerRef.current) return
-      const focusable = containerRef.current.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR)
-      if (focusable.length === 0) return
-      const first = focusable[0]
-      const last = focusable[focusable.length - 1]
-      if (e.shiftKey && document.activeElement === first) {
-        e.preventDefault()
-        last.focus()
-      } else if (!e.shiftKey && document.activeElement === last) {
-        e.preventDefault()
-        first.focus()
-      }
-    }
-    document.addEventListener('keydown', handleKeyDown)
-    return () => {
-      document.removeEventListener('keydown', handleKeyDown)
-      document.body.style.overflow = originalOverflow
-      previouslyFocused?.focus()
-    }
-  }, [containerRef, onClose])
-}
 
 function PickerDialog<T extends { id: string; name: string }>({
   title,

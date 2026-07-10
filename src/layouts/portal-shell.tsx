@@ -1,32 +1,14 @@
-import { useState, type ReactNode } from 'react'
-import { Link, useLocation } from 'react-router-dom'
-import {
-  LayoutDashboard,
-  BookOpen,
-  CalendarDays,
-  ClipboardList,
-  GraduationCap,
-  MessagesSquare,
-  Settings,
-  LogOut,
-  Bell,
-  Search,
-  Menu,
-  X,
-  Layers,
-} from 'lucide-react'
+import { useRef, useState, type ReactNode } from 'react'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { LayoutDashboard, Settings, LogOut, Bell, Menu, X, Layers } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { useModalBehavior } from '@/hooks/use-modal-behavior'
 import { BrandLogo } from '@/components/brand-logo'
 import { useLogout } from '@/features/auth/hooks/use-logout'
 import { useProfile } from '@/features/auth/hooks/use-profile'
 
 const navItems = [
   { label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
-  { label: 'My Classes', href: '#', icon: BookOpen },
-  { label: 'Schedule', href: '#', icon: CalendarDays },
-  { label: 'Assignments', href: '#', icon: ClipboardList },
-  { label: 'Grades', href: '#', icon: GraduationCap },
-  { label: 'Messages', href: '#', icon: MessagesSquare },
   { label: 'Settings', href: '/settings', icon: Settings },
 ]
 
@@ -45,7 +27,12 @@ function isNavItemActive(pathname: string, href: string) {
 }
 
 function SidebarContent({ pathname, isSuperadmin }: { pathname: string; isSuperadmin: boolean }) {
+  const navigate = useNavigate()
   const logout = useLogout()
+
+  function handleLogout() {
+    logout.mutate(undefined, { onSuccess: () => navigate('/login') })
+  }
 
   return (
     <div className="flex h-full flex-col gap-6 p-5">
@@ -107,26 +94,50 @@ function SidebarContent({ pathname, isSuperadmin }: { pathname: string; isSupera
         )}
       </nav>
 
-      <div className="rounded-3xl bg-secondary/40 p-4">
-        <p className="font-display text-sm font-extrabold text-foreground">
-          Need help?
-        </p>
-        <p className="mt-1 text-xs font-medium text-muted-foreground">
-          Ask your teacher or visit the help center anytime.
-        </p>
-        <button className="mt-3 w-full rounded-xl bg-secondary px-3 py-2 text-xs font-bold text-secondary-foreground transition-transform hover:-translate-y-0.5">
-          Open Help Center
-        </button>
-      </div>
-
-      <Link
-        to="/login"
-        onClick={() => logout.mutate()}
-        className="flex items-center gap-3 rounded-2xl px-3.5 py-2.5 text-sm font-bold text-muted-foreground transition-colors hover:bg-accent/10 hover:text-accent"
+      <button
+        type="button"
+        onClick={handleLogout}
+        className="flex cursor-pointer items-center gap-3 rounded-2xl px-3.5 py-2.5 text-left text-sm font-bold text-muted-foreground transition-colors hover:bg-accent/10 hover:text-accent"
       >
         <LogOut className="size-5" />
         Log out
-      </Link>
+      </button>
+    </div>
+  )
+}
+
+function MobileDrawer({
+  pathname,
+  isSuperadmin,
+  onClose,
+}: {
+  pathname: string
+  isSuperadmin: boolean
+  onClose: () => void
+}) {
+  const containerRef = useRef<HTMLDivElement>(null)
+  useModalBehavior(containerRef, onClose)
+
+  return (
+    <div className="fixed inset-0 z-50 lg:hidden">
+      <div className="absolute inset-0 bg-foreground/40" onClick={onClose} aria-hidden />
+      <div
+        ref={containerRef}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Navigation menu"
+        className="absolute left-0 top-0 h-full w-72 bg-sidebar shadow-xl"
+      >
+        <button
+          type="button"
+          onClick={onClose}
+          className="absolute right-3 top-3 flex size-9 cursor-pointer items-center justify-center rounded-full text-muted-foreground hover:bg-muted"
+          aria-label="Close menu"
+        >
+          <X className="size-5" />
+        </button>
+        <SidebarContent pathname={pathname} isSuperadmin={isSuperadmin} />
+      </div>
     </div>
   )
 }
@@ -160,31 +171,20 @@ export function PortalShell({
 
       {/* Mobile drawer */}
       {mobileOpen && (
-        <div className="fixed inset-0 z-50 lg:hidden">
-          <div
-            className="absolute inset-0 bg-foreground/40"
-            onClick={() => setMobileOpen(false)}
-            aria-hidden
-          />
-          <div className="absolute left-0 top-0 h-full w-72 bg-sidebar shadow-xl">
-            <button
-              onClick={() => setMobileOpen(false)}
-              className="absolute right-3 top-3 flex size-9 items-center justify-center rounded-full text-muted-foreground hover:bg-muted"
-              aria-label="Close menu"
-            >
-              <X className="size-5" />
-            </button>
-            <SidebarContent pathname={pathname} isSuperadmin={isSuperadmin} />
-          </div>
-        </div>
+        <MobileDrawer
+          pathname={pathname}
+          isSuperadmin={isSuperadmin}
+          onClose={() => setMobileOpen(false)}
+        />
       )}
 
       <div className="flex min-w-0 flex-1 flex-col">
         {/* Topbar */}
         <header className="sticky top-0 z-40 flex items-center gap-4 border-b border-border bg-background/85 px-4 py-4 backdrop-blur sm:px-6 lg:px-8">
           <button
+            type="button"
             onClick={() => setMobileOpen(true)}
-            className="flex size-10 items-center justify-center rounded-2xl border border-border bg-card text-foreground lg:hidden"
+            className="flex size-10 cursor-pointer items-center justify-center rounded-2xl border border-border bg-card text-foreground lg:hidden"
             aria-label="Open menu"
           >
             <Menu className="size-5" />
@@ -201,17 +201,9 @@ export function PortalShell({
             )}
           </div>
 
-          <div className="relative hidden md:block">
-            <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-            <input
-              type="search"
-              placeholder="Search..."
-              className="h-10 w-48 rounded-2xl border border-border bg-card pl-9 pr-3 text-sm font-medium text-foreground outline-none transition-all placeholder:text-muted-foreground focus:w-56 focus:ring-3 focus:ring-ring/40 lg:w-56 lg:focus:w-64"
-            />
-          </div>
-
           <button
-            className="relative flex size-10 items-center justify-center rounded-2xl border border-border bg-card text-foreground transition-colors hover:bg-muted"
+            type="button"
+            className="relative flex size-10 cursor-pointer items-center justify-center rounded-2xl border border-border bg-card text-foreground transition-colors hover:bg-muted"
             aria-label="Notifications"
           >
             <Bell className="size-5" />
