@@ -12,7 +12,7 @@ import {
   Globe2,
   Music,
 } from 'lucide-react'
-import { PortalShell } from '@/components/portal-shell'
+import { PortalShell } from '@/layouts/portal-shell'
 import { cn } from '@/lib/utils'
 
 const stats = [

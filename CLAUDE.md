@@ -56,7 +56,9 @@ src/
       pages/ components/ hooks/ api/
   components/
     ui/              shadcn/ui primitives (generated, treat as owned)
-    <shared composites, e.g. AppShell, PageHeader>
+    <shared composites, e.g. PageHeader>
+  layouts/           page-shell components composing navigation chrome (sidebar, topbar) around
+                     routed content — distinct from components/, which holds non-shell UI
   hooks/             hooks shared across 2+ features
   lib/
     api-client.ts    the single shared Axios instance (baseURL, interceptors)

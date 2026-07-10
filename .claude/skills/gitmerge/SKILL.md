@@ -15,6 +15,9 @@ commit per unit of work, rebase (never a merge commit) onto `dev`, PR into `dev`
 - Target branch is always `dev`. **Never** open a PR into `main`, never push or rebase `main` —
   the repo owner merges `dev` → `main` manually.
 - Applies to any feature/working branch being landed on `dev`.
+- **Only run this workflow when the user explicitly says to commit/push/land the work.** Do not
+  commit, push, open a PR, or merge proactively — not even right after finishing and verifying a
+  task. Implement and verify, then stop and wait for the go-ahead.
 
 ## Workflow
 

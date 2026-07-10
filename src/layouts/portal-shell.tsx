@@ -16,6 +16,7 @@ import {
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { BrandLogo } from '@/components/brand-logo'
+import { useAuth } from '@/features/auth/hooks/use-auth'
 
 const navItems = [
   { label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
@@ -28,6 +29,8 @@ const navItems = [
 ]
 
 function SidebarContent({ pathname }: { pathname: string }) {
+  const { logout } = useAuth()
+
   return (
     <div className="flex h-full flex-col gap-6 p-5">
       <Link to="/dashboard" className="px-1">
@@ -70,7 +73,8 @@ function SidebarContent({ pathname }: { pathname: string }) {
       </div>
 
       <Link
-        to="/"
+        to="/login"
+        onClick={() => logout()}
         className="flex items-center gap-3 rounded-2xl px-3.5 py-2.5 text-sm font-bold text-muted-foreground transition-colors hover:bg-accent/10 hover:text-accent"
       >
         <LogOut className="size-5" />
