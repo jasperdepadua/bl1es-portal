@@ -10,6 +10,18 @@
 Kinder is **descriptive, non-numeric** (DO 015 §40) — no numeric grades, and no academic awards for
 Kindergarten (only character/attendance recognition, itself deferred).
 
+## Where this lives — the Academics umbrella
+
+Assessment is a sub-item of an **Academics** menu (which will also hold **Quizzes & Exams** and
+**Events** for higher grades). Assessment is **Key-Stage-polymorphic** — one menu location, a
+different engine by grade:
+- **Kinder + Grades 1-3 (KS1):** descriptive competency checklist (Kinder CO/DV/BG; Grades 1-3 A-E).
+- **Grades 4-6 (KS2):** numeric grades computed from graded work (Written Works / Performance Tasks
+  / Exams), authored under Quizzes & Exams.
+
+v1 builds the **Kinder path only**, but the model below is generalized so Grades 1-3 reuse it with no
+rewrite (see *Scaling* below).
+
 ---
 
 ## Instrument 1 — Kindergarten Progress Report (the "grading")
@@ -37,11 +49,12 @@ record** (per term/month) pulled from the Attendance feature.
 > The exact competency wording is transcribed/seeded verbatim from DO 015 Annex E when we build the
 > seed data — this spec captures the structure, not the final competency strings.
 
-### Data model
-- **`kinder_competencies`** (seed) — `id`, `domain` (enum), `sub_area` (nullable), `sequence`,
-  `label`. Seeded once from Annex E.
+### Data model (generalized so Grades 1-3 reuse it)
+- **`competencies`** (seed) — `id`, `grade_level_id`, `domain`, `sub_area` (nullable), `sequence`,
+  `label`. Seeded per grade level (Kinder from Annex E; Grades 1-3 later from Annex F / curriculum).
 - **`progress_ratings`** — `id`, `enrollment_id`, `competency_id`, `grading_period_id`, `rating`
-  (CO|DV|BG, nullable until marked), `updated_by`, `updated_at`. Unique
+  (a code from the grade's descriptive scale — **CO/DV/BG** for Kinder, **A-E** for Grades 1-3;
+  nullable until marked), `updated_by`, `updated_at`. Unique
   (`enrollment_id`, `competency_id`, `grading_period_id`).
 - **`progress_report_remarks`** — `id`, `enrollment_id`, `grading_period_id`, `comments` (text),
   `parent_acknowledged_at` (nullable). Unique (`enrollment_id`, `grading_period_id`).
@@ -97,6 +110,17 @@ we source the official guide's item lists + norm tables.
 
 Both instruments hang off year-scoped `enrollments` — the Progress Report per term (via
 `grading_periods`), ECCD per checkpoint — so everything is reportable per school year.
+
+## Scaling to other grades (future — architecture, not v1 build)
+
+- **Grades 1-3 (KS1)** — same descriptive-checklist model: seed their `competencies` + add the
+  **A-E** scale (Table 8: A Advancing · B Benchmarking · C Connecting · D Developing · E Emerging),
+  plus the PACE form. No ECCD. No structural change to the tables above.
+- **Grades 4-6 (KS2)** — a separate **numeric** engine: `graded_activities` (a quiz/exam/task tied to
+  a subject + term, typed WW/PT/Exam, with max points) + `activity_scores` (per student) → weighted
+  term grade (Table 9) → transmutation (SY26-27), then zero-based (SY27-28+). Authored via the
+  **Quizzes & Exams** sub-menu; the Assessment view then shows numeric grades instead of the
+  descriptive checklist.
 
 ## Out of scope / deferred (see roadmap)
 
