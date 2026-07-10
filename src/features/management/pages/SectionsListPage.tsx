@@ -14,7 +14,7 @@ export default function SectionsListPage() {
   return (
     <PortalShell
       title="Sections"
-      subtitle="All class sections across grade levels and school years."
+      subtitle="All sections across grade levels and school years."
     >
       {isLoading ? (
         <div className="rounded-3xl border border-border bg-card px-6 py-16 text-center text-sm font-medium text-muted-foreground">

@@ -36,7 +36,7 @@ export default function LoginPage() {
   return (
     <div className="flex min-h-screen flex-col lg:flex-row">
       {/* Illustration panel */}
-      <section className="relative flex flex-col justify-between overflow-hidden bg-primary px-8 py-10 text-primary-foreground lg:w-1/2 lg:px-12">
+      <section className="relative hidden flex flex-col justify-between overflow-hidden bg-primary px-8 py-10 text-primary-foreground lg:flex lg:w-1/2 lg:px-12">
         <div className="absolute -left-16 -top-16 size-56 rounded-full bg-secondary/30" />
         <div className="absolute -bottom-20 right-10 size-64 rounded-full bg-accent/25" />
 
@@ -64,8 +64,8 @@ export default function LoginPage() {
             Welcome back to a happy day of learning!
           </h2>
           <p className="mt-3 text-pretty font-medium text-primary-foreground/85">
-            Sign in to see your classes, assignments, and progress — all in one
-            cheerful place made for our BL1ES family.
+            Sign in to stay connected with everything happening at BL1ES —
+            attendance, progress, and updates, all in one cheerful place.
           </p>
         </div>
       </section>
@@ -103,7 +103,7 @@ export default function LoginPage() {
                 onClick={() => setRole(key)}
                 aria-pressed={role === key}
                 className={cn(
-                  'flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-bold transition-all',
+                  'flex cursor-pointer items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-bold transition-all',
                   role === key
                     ? 'bg-card text-foreground shadow-sm'
                     : 'text-muted-foreground hover:text-foreground',
@@ -121,7 +121,7 @@ export default function LoginPage() {
                 htmlFor="username"
                 className="text-sm font-bold text-foreground"
               >
-                {role === 'student' ? 'Student ID' : 'Username'}
+                {role === 'student' ? 'Student Number' : 'Username'}
               </label>
               <div className="relative">
                 <User className="pointer-events-none absolute left-3.5 top-1/2 size-5 -translate-y-1/2 text-muted-foreground" />
@@ -134,7 +134,7 @@ export default function LoginPage() {
                   placeholder={
                     role === 'student' ? 'e.g. bl1es-2026-0142' : 'e.g. maria.reyes'
                   }
-                  className="h-12 w-full rounded-2xl border border-border bg-card pl-11 pr-4 text-sm font-medium text-foreground outline-none transition-all placeholder:text-muted-foreground/70 focus:border-primary focus:ring-3 focus:ring-ring/30"
+                  className="h-12 w-full rounded-2xl border border-border bg-card pl-11 pr-4 text-sm font-medium text-foreground outline-none transition-all placeholder:text-muted-foreground focus:border-primary focus:ring-3 focus:ring-ring/30"
                 />
               </div>
             </div>
@@ -155,12 +155,12 @@ export default function LoginPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Enter your password"
-                  className="h-12 w-full rounded-2xl border border-border bg-card pl-11 pr-11 text-sm font-medium text-foreground outline-none transition-all placeholder:text-muted-foreground/70 focus:border-primary focus:ring-3 focus:ring-ring/30"
+                  className="h-12 w-full rounded-2xl border border-border bg-card pl-11 pr-11 text-sm font-medium text-foreground outline-none transition-all placeholder:text-muted-foreground focus:border-primary focus:ring-3 focus:ring-ring/30"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword((s) => !s)}
-                  className="absolute right-3 top-1/2 flex size-8 -translate-y-1/2 items-center justify-center rounded-lg text-muted-foreground hover:text-foreground"
+                  className="absolute right-3 top-1/2 flex size-8 cursor-pointer -translate-y-1/2 items-center justify-center rounded-lg text-muted-foreground hover:text-foreground"
                   aria-label={showPassword ? 'Hide password' : 'Show password'}
                 >
                   {showPassword ? (
@@ -173,16 +173,18 @@ export default function LoginPage() {
             </div>
 
             <div className="flex items-center justify-between">
-              <label className="flex items-center gap-2 text-sm font-semibold text-muted-foreground">
+              <label className="flex cursor-not-allowed items-center gap-2 text-sm font-semibold text-muted-foreground opacity-50">
                 <input
                   type="checkbox"
-                  className="size-4 rounded border-border accent-primary"
+                  disabled
+                  className="size-4 rounded border-border accent-primary disabled:cursor-not-allowed"
                 />
                 Remember me
               </label>
               <button
                 type="button"
-                className="text-sm font-bold text-primary hover:underline"
+                disabled
+                className="cursor-pointer text-sm font-bold text-primary hover:underline disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50"
               >
                 Forgot password?
               </button>
@@ -201,7 +203,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={login.isPending}
-              className="mt-2 flex h-12 items-center justify-center gap-2 rounded-2xl bg-primary text-sm font-extrabold text-primary-foreground shadow-sm transition-transform hover:-translate-y-0.5 active:translate-y-0 disabled:pointer-events-none disabled:opacity-60"
+              className="mt-2 flex h-12 cursor-pointer items-center justify-center gap-2 rounded-2xl bg-primary text-sm font-extrabold text-primary-foreground shadow-sm transition-transform hover:-translate-y-0.5 active:translate-y-0 disabled:pointer-events-none disabled:opacity-60"
             >
               {login.isPending ? 'Signing in…' : 'Sign in'}
               <ArrowRight className="size-5" />

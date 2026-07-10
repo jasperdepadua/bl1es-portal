@@ -130,7 +130,7 @@ describe('SectionDetailPage', () => {
 
     await user.click(await screen.findByRole('tab', { name: /subject teachers/i }))
 
-    expect(await screen.findByText('No discrete subjects for Kinder')).toBeInTheDocument()
+    expect(await screen.findByText('No separate subjects for Kinder')).toBeInTheDocument()
   })
 
   it('lists subject-teacher assignments when the grade level has discrete subjects', async () => {

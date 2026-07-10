@@ -6,13 +6,13 @@ import {
   ArrowUpRight,
   CheckCircle2,
   Clock,
-  Palette,
   Calculator,
   FlaskConical,
   Globe2,
   Music,
 } from 'lucide-react'
 import { PortalShell } from '@/layouts/portal-shell'
+import { useProfile } from '@/features/auth/hooks/use-profile'
 import { cn } from '@/lib/utils'
 
 const stats = [
@@ -33,9 +33,9 @@ const stats = [
   {
     label: 'Attendance',
     value: '98%',
-    hint: 'This quarter',
+    hint: 'This term',
     icon: CheckCircle2,
-    tint: 'bg-chart-4/15 text-[color:var(--chart-4)]',
+    tint: 'bg-chart-4/15 text-success-foreground',
   },
   {
     label: 'Star Points',
@@ -48,11 +48,10 @@ const stats = [
 
 const subjects = [
   { name: 'Mathematics', teacher: 'Mr. Santos', progress: 82, icon: Calculator, tint: 'bg-primary/10 text-primary' },
-  { name: 'Science', teacher: 'Ms. Cruz', progress: 74, icon: FlaskConical, tint: 'bg-chart-4/15 text-[color:var(--chart-4)]' },
+  { name: 'Science', teacher: 'Ms. Cruz', progress: 74, icon: FlaskConical, tint: 'bg-chart-4/15 text-success-foreground' },
   { name: 'Reading & Writing', teacher: 'Ms. Reyes', progress: 90, icon: BookOpen, tint: 'bg-accent/15 text-accent' },
   { name: 'Araling Panlipunan', teacher: 'Mr. Dela Cruz', progress: 66, icon: Globe2, tint: 'bg-secondary/50 text-secondary-foreground' },
-  { name: 'Arts', teacher: 'Ms. Lim', progress: 95, icon: Palette, tint: 'bg-chart-5/15 text-[color:var(--chart-5)]' },
-  { name: 'Music (MAPEH)', teacher: 'Mr. Bautista', progress: 88, icon: Music, tint: 'bg-primary/10 text-primary' },
+  { name: 'MAPEH', teacher: 'Mr. Bautista', progress: 88, icon: Music, tint: 'bg-secondary/50 text-secondary-foreground' },
 ]
 
 const schedule = [
@@ -70,11 +69,11 @@ const tasks = [
 ]
 
 export default function DashboardPage() {
+  const { data: profile } = useProfile()
+  const greeting = profile?.firstName ? `Good morning, ${profile.firstName}!` : 'Good morning!'
+
   return (
-    <PortalShell
-      title="Good morning, Ms. Reyes!"
-      subtitle="Here's what's happening in your Grade 4 class today."
-    >
+    <PortalShell title="Dashboard" subtitle="Your day at a glance.">
       <div className="flex flex-col gap-6">
         {/* Welcome banner */}
         <section className="relative overflow-hidden rounded-3xl bg-primary px-6 py-7 text-primary-foreground sm:px-8">
@@ -87,13 +86,16 @@ export default function DashboardPage() {
                 Monday, July 13
               </p>
               <h2 className="mt-3 text-balance font-display text-2xl font-extrabold leading-tight sm:text-3xl">
-                You have 2 classes and 3 assignments to review today.
+                {greeting}
               </h2>
               <p className="mt-2 font-medium text-primary-foreground/85">
-                Keep up the great work — your class is 84% through the quarter goals!
+                Keep up the great work — your class is 84% through this term&apos;s goals!
               </p>
             </div>
-            <button className="inline-flex items-center gap-2 self-start rounded-2xl bg-primary-foreground px-5 py-3 text-sm font-extrabold text-primary transition-transform hover:-translate-y-0.5">
+            <button
+              type="button"
+              className="inline-flex cursor-pointer items-center gap-2 self-start rounded-2xl bg-primary-foreground px-5 py-3 text-sm font-extrabold text-primary transition-transform hover:-translate-y-0.5"
+            >
               View Schedule
               <ArrowUpRight className="size-4" />
             </button>
@@ -138,11 +140,14 @@ export default function DashboardPage() {
                   My Subjects
                 </h3>
                 <p className="text-sm font-medium text-muted-foreground">
-                  Class progress this quarter
+                  Class progress this term
                 </p>
               </div>
-              <button className="text-sm font-bold text-primary hover:underline">
-                See all
+              <button
+                type="button"
+                className="cursor-pointer text-sm font-bold text-primary hover:underline"
+              >
+                View all
               </button>
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
@@ -151,7 +156,7 @@ export default function DashboardPage() {
                 return (
                   <div
                     key={subject.name}
-                    className="rounded-2xl border border-border bg-background p-4 transition-transform hover:-translate-y-0.5"
+                    className="rounded-2xl border border-border bg-background p-4"
                   >
                     <div className="flex items-center gap-3">
                       <span
@@ -210,7 +215,7 @@ export default function DashboardPage() {
                     className={cn(
                       'flex size-9 shrink-0 items-center justify-center rounded-xl',
                       item.done
-                        ? 'bg-chart-4/15 text-[color:var(--chart-4)]'
+                        ? 'bg-chart-4/15 text-success-foreground'
                         : item.now
                           ? 'bg-primary text-primary-foreground'
                           : 'bg-muted text-muted-foreground',
@@ -231,7 +236,7 @@ export default function DashboardPage() {
                     </p>
                   </div>
                   {item.now && (
-                    <span className="rounded-full bg-primary px-2.5 py-1 text-[10px] font-extrabold text-primary-foreground">
+                    <span className="rounded-full bg-primary px-2.5 py-1 text-xs font-extrabold text-primary-foreground">
                       NOW
                     </span>
                   )}
@@ -252,7 +257,10 @@ export default function DashboardPage() {
                 Don&apos;t forget to check these off!
               </p>
             </div>
-            <button className="text-sm font-bold text-primary hover:underline">
+            <button
+              type="button"
+              className="cursor-pointer text-sm font-bold text-primary hover:underline"
+            >
               View all
             </button>
           </div>
@@ -263,12 +271,12 @@ export default function DashboardPage() {
                 className="rounded-2xl border border-border bg-background p-4"
               >
                 <div className="flex items-center justify-between">
-                  <span className="rounded-full bg-muted px-2.5 py-1 text-[11px] font-bold text-muted-foreground">
+                  <span className="rounded-full bg-muted px-2.5 py-1 text-xs font-bold text-muted-foreground">
                     {task.subject}
                   </span>
                   <span
                     className={cn(
-                      'rounded-full px-2.5 py-1 text-[11px] font-bold',
+                      'rounded-full px-2.5 py-1 text-xs font-bold',
                       task.urgent
                         ? 'bg-accent/15 text-accent'
                         : 'bg-secondary/50 text-secondary-foreground',
@@ -278,7 +286,10 @@ export default function DashboardPage() {
                   </span>
                 </div>
                 <p className="mt-3 font-bold text-foreground">{task.title}</p>
-                <button className="mt-4 w-full rounded-xl border border-border bg-card py-2 text-sm font-bold text-foreground transition-colors hover:bg-muted">
+                <button
+                  type="button"
+                  className="mt-4 w-full cursor-pointer rounded-xl border border-border bg-card py-2 text-sm font-bold text-foreground transition-colors hover:bg-muted"
+                >
                   Mark as done
                 </button>
               </div>
