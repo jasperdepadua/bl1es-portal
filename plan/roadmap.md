@@ -83,3 +83,14 @@ Parked deliberately — real features, just not in the first release.
   [`specs/reference-findings.md`](../specs/reference-findings.md).)
 - **Student onboarding** — synthesized-email + guardian-delivered setup (see auth spec, open
   question #2) — confirm acceptable.
+- **Homework** — not a distinct concept anywhere in the plan. DepEd's KS2 grading only recognizes
+  Written Work / Performance Task / Exam (see `reference-findings.md`); homework would fall under
+  one of those. **Quizzes & Exams** (deferred) is a teacher gradebook for recording offline scores,
+  not an online assignment/submission flow — if that's wanted later, it's a separate feature to
+  scope, not something Quizzes & Exams already covers.
+- **Event-specific timestamps** — when Quizzes & Exams gets specced, follow the actor+timestamp
+  pattern already used in `assessment.md` (`updated_by/updated_at`, `assessed_by/assessed_at`,
+  `parent_acknowledged_at`) rather than plain `created_at`/`updated_at` — e.g. a `published_at` on
+  `graded_activities` to gate when scores become visible to students. This is distinct from the
+  deferred general **audit log** (who changed *any* record) above, which is a broader change-history
+  feature.

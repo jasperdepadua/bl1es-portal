@@ -1,8 +1,6 @@
-const STUDENT_NUMBER = /^bl1es-\d{4}-\d{4}$/i
+export type LoginRole = 'student' | 'teacher'
 
-export function resolveLoginEmail(identifier: string): string {
+export function resolveLoginEmail(identifier: string, role: LoginRole): string {
   const id = identifier.trim().toLowerCase()
-  return STUDENT_NUMBER.test(id)
-    ? `${id}@students.bl1es.portal`
-    : `${id}@staff.bl1es.portal`
+  return role === 'student' ? `${id}@students.bl1es.portal` : `${id}@staff.bl1es.portal`
 }
