@@ -12,17 +12,20 @@ import {
   BookOpen,
 } from 'lucide-react'
 import { BrandLogo } from '@/components/brand-logo'
+import { useAuth } from '@/features/auth/hooks/use-auth'
 import { cn } from '@/lib/utils'
 
 type Role = 'student' | 'teacher'
 
 export default function LoginPage() {
   const navigate = useNavigate()
+  const { login } = useAuth()
   const [role, setRole] = useState<Role>('student')
   const [showPassword, setShowPassword] = useState(false)
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
+    login()
     navigate('/dashboard')
   }
 

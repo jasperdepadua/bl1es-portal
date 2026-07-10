@@ -7,7 +7,7 @@ import {
   Camera,
   Check,
 } from 'lucide-react'
-import { PortalShell } from '@/components/portal-shell'
+import { PortalShell } from '@/layouts/portal-shell'
 import { cn } from '@/lib/utils'
 
 type SectionKey = 'profile' | 'notifications' | 'preferences' | 'security'
