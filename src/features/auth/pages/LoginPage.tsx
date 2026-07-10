@@ -10,23 +10,28 @@ import {
   Sparkles,
   Star,
   BookOpen,
+  AlertCircle,
 } from 'lucide-react'
 import { BrandLogo } from '@/components/brand-logo'
-import { useAuth } from '@/features/auth/hooks/use-auth'
+import { useLogin } from '@/features/auth/hooks/use-login'
 import { cn } from '@/lib/utils'
 
 type Role = 'student' | 'teacher'
 
 export default function LoginPage() {
   const navigate = useNavigate()
-  const { login } = useAuth()
+  const login = useLogin()
   const [role, setRole] = useState<Role>('student')
   const [showPassword, setShowPassword] = useState(false)
+  const [identifier, setIdentifier] = useState('')
+  const [password, setPassword] = useState('')
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    login()
-    navigate('/dashboard')
+    login.mutate(
+      { identifier, password },
+      { onSuccess: () => navigate('/dashboard') },
+    )
   }
 
   return (
@@ -125,6 +130,8 @@ export default function LoginPage() {
                   id="username"
                   type="text"
                   required
+                  value={identifier}
+                  onChange={(e) => setIdentifier(e.target.value)}
                   placeholder={
                     role === 'student' ? 'e.g. bl1es-2026-0142' : 'you@bl1es.edu.ph'
                   }
@@ -146,6 +153,8 @@ export default function LoginPage() {
                   id="password"
                   type={showPassword ? 'text' : 'password'}
                   required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                   placeholder="Enter your password"
                   className="h-12 w-full rounded-2xl border border-border bg-card pl-11 pr-11 text-sm font-medium text-foreground outline-none transition-all placeholder:text-muted-foreground/70 focus:border-primary focus:ring-3 focus:ring-ring/30"
                 />
@@ -180,11 +189,22 @@ export default function LoginPage() {
               </button>
             </div>
 
+            {login.isError && (
+              <div
+                role="alert"
+                className="flex items-center gap-2 rounded-2xl border border-destructive/20 bg-destructive/10 px-4 py-3 text-sm font-semibold text-destructive"
+              >
+                <AlertCircle className="size-4 shrink-0" />
+                {login.error.message}
+              </div>
+            )}
+
             <button
               type="submit"
-              className="mt-2 flex h-12 items-center justify-center gap-2 rounded-2xl bg-primary text-sm font-extrabold text-primary-foreground shadow-sm transition-transform hover:-translate-y-0.5 active:translate-y-0"
+              disabled={login.isPending}
+              className="mt-2 flex h-12 items-center justify-center gap-2 rounded-2xl bg-primary text-sm font-extrabold text-primary-foreground shadow-sm transition-transform hover:-translate-y-0.5 active:translate-y-0 disabled:pointer-events-none disabled:opacity-60"
             >
-              Sign in
+              {login.isPending ? 'Signing in…' : 'Sign in'}
               <ArrowRight className="size-5" />
             </button>
           </form>

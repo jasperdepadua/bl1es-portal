@@ -16,7 +16,8 @@ import {
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { BrandLogo } from '@/components/brand-logo'
-import { useAuth } from '@/features/auth/hooks/use-auth'
+import { useLogout } from '@/features/auth/hooks/use-logout'
+import { useProfile } from '@/features/auth/hooks/use-profile'
 
 const navItems = [
   { label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
@@ -28,8 +29,14 @@ const navItems = [
   { label: 'Settings', href: '/settings', icon: Settings },
 ]
 
+const ROLE_LABELS = {
+  superadmin: 'Principal',
+  admin: 'Teacher',
+  normal: 'Student',
+} as const
+
 function SidebarContent({ pathname }: { pathname: string }) {
-  const { logout } = useAuth()
+  const logout = useLogout()
 
   return (
     <div className="flex h-full flex-col gap-6 p-5">
@@ -74,7 +81,7 @@ function SidebarContent({ pathname }: { pathname: string }) {
 
       <Link
         to="/login"
-        onClick={() => logout()}
+        onClick={() => logout.mutate()}
         className="flex items-center gap-3 rounded-2xl px-3.5 py-2.5 text-sm font-bold text-muted-foreground transition-colors hover:bg-accent/10 hover:text-accent"
       >
         <LogOut className="size-5" />
@@ -88,15 +95,20 @@ export function PortalShell({
   children,
   title,
   subtitle,
-  user = { name: 'Ms. Reyes', role: 'Grade 4 Teacher', initials: 'MR' },
 }: {
   children: ReactNode
   title: string
   subtitle?: string
-  user?: { name: string; role: string; initials: string }
 }) {
   const { pathname } = useLocation()
   const [mobileOpen, setMobileOpen] = useState(false)
+  const { data: profile } = useProfile()
+
+  const displayName = profile ? `${profile.firstName} ${profile.lastName}` : ''
+  const initials = profile
+    ? `${profile.firstName.charAt(0)}${profile.lastName.charAt(0)}`.toUpperCase()
+    : ''
+  const roleLabel = profile ? ROLE_LABELS[profile.role] : ''
 
   return (
     <div className="flex min-h-screen bg-background">
@@ -167,13 +179,11 @@ export function PortalShell({
 
           <div className="flex items-center gap-3">
             <span className="flex size-10 items-center justify-center rounded-2xl bg-primary text-sm font-extrabold text-primary-foreground">
-              {user.initials}
+              {initials}
             </span>
             <div className="hidden leading-tight sm:block">
-              <p className="text-sm font-bold text-foreground">{user.name}</p>
-              <p className="text-xs font-medium text-muted-foreground">
-                {user.role}
-              </p>
+              <p className="text-sm font-bold text-foreground">{displayName}</p>
+              <p className="text-xs font-medium text-muted-foreground">{roleLabel}</p>
             </div>
           </div>
         </header>

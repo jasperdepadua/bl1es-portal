@@ -15,8 +15,11 @@ You review code changes for the bl1es-portal before the tech lead lands them.
 - **Convention compliance (`CLAUDE.md`):** API-layer pipeline respected (no `axios` outside
   `api-client.ts`, no fetch-in-`useEffect`), feature-oriented placement, `cn()` usage, TS strict,
   query-key convention.
-- **Security / RLS awareness:** for anything touching data or auth, does it respect the
-  role/permission model in the specs? Never trust the client for authorization.
+- **Security (first-class — flag any concern as at least Important):** authorization enforced at the
+  DB via RLS, never the client; **no privilege-escalation paths** (e.g. a user updating a privileged
+  column of their own row such as `role`/`is_active`, which RLS alone can't restrict); no secrets
+  committed or logged; inputs validated/scoped server-side; no injection (parameterized queries, no
+  string-built SQL).
 - **Tests:** do meaningful tests exist for the behavior?
 
 ## Rules of engagement

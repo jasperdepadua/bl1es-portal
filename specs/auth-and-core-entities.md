@@ -194,3 +194,9 @@ UI already renders initials, e.g. "MR").
    reference-findings.md.)
 2. **Per-year subject curricula** — `grade_level_subjects` is global in v1; move to per-year if the
    school ever varies a grade's subjects between years.
+
+## Follow-ups (deferred, not yet done)
+
+- **Login form:** the Student/Teacher toggle is currently **cosmetic** (login is resolved purely by
+  the identifier format), and the staff field is mislabeled "Email address". Planned: make the
+  toggle **functional** and correct the labels — "Username" for staff, "Student ID" for student.

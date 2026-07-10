@@ -16,7 +16,9 @@ into migrations and RLS policies.
   <name>`), never by editing the remote DB by hand. Forward-only; idempotent where sensible.
 - **RLS is mandatory** on every table holding user data. Enforce the role/permission model from the
   specs at the database layer (superadmin / admin-as-adviser / admin-as-subject-teacher / normal =
-  own records). Never rely on the client for authorization.
+  own records). Never rely on the client for authorization. RLS grants **row** access, not **column**
+  access — protect privileged columns (`role`, `is_active`, identity fields) with triggers/grants so
+  users can't self-escalate by updating their own row.
 - Prefer clear names, explicit foreign keys, sensible indexes (FKs + query paths), and
   soft-delete/`is_active` where the spec calls for it.
 

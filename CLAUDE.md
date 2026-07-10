@@ -154,6 +154,26 @@ export function useLogin() {
 **Query key convention:** always an array starting with the feature name, e.g. `['auth', 'profile']`,
 `['grades', studentId]`. Prevents collisions and keeps invalidation scoped and predictable.
 
+## Security
+
+Security is a **first-class priority** — non-negotiable, and it applies to every change (yours and
+any sub-agent's):
+
+- **Authorize at the database, never the client.** RLS is enabled on every table holding data and
+  its policies enforce the role model. UI-level gating is UX, not security — the client is untrusted.
+- **Guard columns, not just rows.** RLS grants access to a *row*, not specific *columns*. Protect
+  privileged columns (`role`, `is_active`, identity fields, sensitive flags) with triggers/grants so
+  a user can't self-escalate by updating their own row.
+- **Least privilege, default deny.** Grant the narrowest access that works; writes to shared/config
+  data are superadmin-only unless a spec says otherwise.
+- **Secrets never touch the repo or chat.** Only the public anon/publishable key goes in client env
+  (git-ignored `.env.local`). The `service_role` key, database password, and tokens stay local to
+  the operator — never committed, never pasted into chat.
+- **Security-sensitive changes get a human gate.** Anything touching auth, RLS, roles/permissions,
+  or secrets is reviewed by the repo owner before it lands, and run past the `code-reviewer` agent
+  for privilege-escalation / secret-leak / injection.
+- **Don't roll your own auth or crypto.** Supabase Auth handles passwords, sessions, and tokens.
+
 ## Repository map
 
 - `CLAUDE.md` — this file; the always-loaded operating manual.

@@ -1,32 +1,33 @@
-import { createContext, useContext, useState, type ReactNode } from 'react'
-
-const STORAGE_KEY = 'bl1es-mock-auth'
+import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
+import type { Session } from '@supabase/supabase-js'
+import { supabase } from '@/lib/supabase'
 
 interface AuthContextValue {
+  session: Session | null
   isAuthenticated: boolean
-  login: () => void
-  logout: () => void
+  isLoading: boolean
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null)
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [isAuthenticated, setIsAuthenticated] = useState(
-    () => localStorage.getItem(STORAGE_KEY) === 'true',
-  )
+  const [session, setSession] = useState<Session | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
 
-  function login() {
-    localStorage.setItem(STORAGE_KEY, 'true')
-    setIsAuthenticated(true)
-  }
-
-  function logout() {
-    localStorage.removeItem(STORAGE_KEY)
-    setIsAuthenticated(false)
-  }
+  useEffect(() => {
+    supabase.auth
+      .getSession()
+      .then(({ data }) => setSession(data.session))
+      .catch(() => {}) // if session lookup fails, fall through to signed-out rather than hang
+      .finally(() => setIsLoading(false))
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_e, s) => setSession(s))
+    return () => subscription.unsubscribe()
+  }, [])
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, login, logout }}>
+    <AuthContext.Provider value={{ session, isAuthenticated: !!session, isLoading }}>
       {children}
     </AuthContext.Provider>
   )
