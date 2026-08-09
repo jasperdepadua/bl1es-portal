@@ -15,13 +15,24 @@ export interface QueryBuilderMock {
   update: Mock
   delete: Mock
   single: Mock
+  maybeSingle: Mock
   then: (
     onFulfilled: (value: QueryResult) => unknown,
     onRejected?: (reason: unknown) => unknown,
   ) => Promise<unknown>
 }
 
-const CHAIN_METHODS = ['select', 'eq', 'in', 'order', 'insert', 'update', 'delete', 'single'] as const
+const CHAIN_METHODS = [
+  'select',
+  'eq',
+  'in',
+  'order',
+  'insert',
+  'update',
+  'delete',
+  'single',
+  'maybeSingle',
+] as const
 
 /**
  * Stand-in for a supabase-js `PostgrestFilterBuilder`: every chain method (select/eq/in/

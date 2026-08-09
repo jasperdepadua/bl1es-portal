@@ -18,8 +18,9 @@ export async function getCurrentProfile(): Promise<Profile | null> {
     .from('profiles')
     .select('id, role, first_name, last_name, username')
     .eq('id', user.id)
-    .single()
+    .maybeSingle()
   if (error) throw error
+  if (!data) return null
 
   return {
     id: data.id,

@@ -1,5 +1,6 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
 import LoginPage from '@/features/auth/pages/LoginPage'
+import AcceptInvitePage from '@/features/auth/pages/AcceptInvitePage'
 import DashboardPage from '@/features/dashboard/pages/DashboardPage'
 import SettingsPage from '@/features/settings/pages/SettingsPage'
 import SectionsListPage from '@/features/management/pages/SectionsListPage'
@@ -8,6 +9,8 @@ import SchoolYearsListPage from '@/features/management/pages/SchoolYearsListPage
 import SchoolYearDetailPage from '@/features/management/pages/SchoolYearDetailPage'
 import GradeLevelsPage from '@/features/management/pages/GradeLevelsPage'
 import SubjectsPage from '@/features/management/pages/SubjectsPage'
+import TeachersPage from '@/features/management/pages/TeachersPage'
+import StudentsPage from '@/features/management/pages/StudentsPage'
 import { useAuth } from '@/features/auth/hooks/use-auth'
 import { RequireAuth } from '@/routes/require-auth'
 import { RequireSuperadmin } from '@/routes/require-superadmin'
@@ -29,10 +32,13 @@ function App() {
         path="/login"
         element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <LoginPage />}
       />
+      <Route path="/accept-invite" element={<AcceptInvitePage />} />
       <Route element={<RequireAuth />}>
         <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/settings" element={<SettingsPage />} />
         <Route element={<RequireSuperadmin />}>
+          <Route path="/management/teachers" element={<TeachersPage />} />
+          <Route path="/management/students" element={<StudentsPage />} />
           <Route path="/management/sections" element={<SectionsListPage />} />
           <Route path="/management/sections/:sectionId" element={<SectionDetailPage />} />
           <Route path="/management/subjects" element={<SubjectsPage />} />
