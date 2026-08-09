@@ -140,6 +140,7 @@ export type Database = {
         Row: {
           end_date: string | null
           id: string
+          is_active: boolean
           label: string
           school_year_id: string
           sequence: number
@@ -148,6 +149,7 @@ export type Database = {
         Insert: {
           end_date?: string | null
           id?: string
+          is_active?: boolean
           label: string
           school_year_id: string
           sequence: number
@@ -156,6 +158,7 @@ export type Database = {
         Update: {
           end_date?: string | null
           id?: string
+          is_active?: boolean
           label?: string
           school_year_id?: string
           sequence?: number
@@ -397,6 +400,10 @@ export type Database = {
       can_access_student: { Args: { student: string }; Returns: boolean }
       is_admin: { Args: never; Returns: boolean }
       is_superadmin: { Args: never; Returns: boolean }
+      set_current_school_year: {
+        Args: { p_year_id: string }
+        Returns: undefined
+      }
     }
     Enums: {
       enrollment_status: "enrolled" | "inactive"

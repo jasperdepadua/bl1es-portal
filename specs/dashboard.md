@@ -49,6 +49,17 @@ not the dashboard.)
 - **Charts / analytics / trends** — keep v1 to counts and status, no visualizations.
 - The dropped v0 placeholders (assignments, star points, schedule, subjects) — reintroduced only if/
   when those features actually exist.
+- **Action-needed banner** — a per-role "things that need you" surface, distinct from the existing
+  per-role **Alerts** above (which are attendance-threshold-specific). This is a general
+  setup/completeness nudge: e.g. superadmin — no current school year set, a grade level/section
+  with no adviser, a subject with no grade-level assignment; teacher — a student not yet
+  enrolled/placed into a section, attendance or the term's assessment not yet recorded; student —
+  a progress report pending acknowledgement. Idea: a dismissible banner (or persistent checklist)
+  at the top of each dashboard, surfacing exactly the next incomplete step for that role. Needs its
+  own design pass: exact "needs attention" rules per role, dismissible-vs-persistent, and whether
+  it's computed live (query current state on load) or event-driven (would need the notification
+  engine). Candidate to pull forward alongside Announcements — it serves the core value loop
+  directly (surfacing the setup step a principal forgot, or the record a teacher hasn't filed yet).
 
 ## Open questions
 

@@ -4,6 +4,10 @@ import DashboardPage from '@/features/dashboard/pages/DashboardPage'
 import SettingsPage from '@/features/settings/pages/SettingsPage'
 import SectionsListPage from '@/features/management/pages/SectionsListPage'
 import SectionDetailPage from '@/features/management/pages/SectionDetailPage'
+import SchoolYearsListPage from '@/features/management/pages/SchoolYearsListPage'
+import SchoolYearDetailPage from '@/features/management/pages/SchoolYearDetailPage'
+import GradeLevelsPage from '@/features/management/pages/GradeLevelsPage'
+import SubjectsPage from '@/features/management/pages/SubjectsPage'
 import { useAuth } from '@/features/auth/hooks/use-auth'
 import { RequireAuth } from '@/routes/require-auth'
 import { RequireSuperadmin } from '@/routes/require-superadmin'
@@ -31,6 +35,13 @@ function App() {
         <Route element={<RequireSuperadmin />}>
           <Route path="/management/sections" element={<SectionsListPage />} />
           <Route path="/management/sections/:sectionId" element={<SectionDetailPage />} />
+          <Route path="/management/subjects" element={<SubjectsPage />} />
+          <Route path="/management/grade-levels" element={<GradeLevelsPage />} />
+          <Route path="/management/school-years" element={<SchoolYearsListPage />} />
+          <Route
+            path="/management/school-years/:schoolYearId"
+            element={<SchoolYearDetailPage />}
+          />
         </Route>
       </Route>
     </Routes>

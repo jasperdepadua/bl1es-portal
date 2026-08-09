@@ -66,6 +66,11 @@ Parked deliberately — real features, just not in the first release.
   report **request + approval** workflow. (v1 gets only a simple on-screen/printable record view.)
 - **Announcements** — parent communication feed. Cheap + high parent-value; **candidate to pull
   forward** early in iteration 2, given the docs' heavy emphasis on parent comms.
+- **Action-needed dashboard banner** — per-role "things that need you" nudges (e.g. principal: no
+  current school year set, a section/grade level missing an adviser or subject assignment;
+  teacher: a student not yet placed in a section, attendance/assessment not yet recorded;
+  student: a progress report pending acknowledgement). Also a candidate to pull forward alongside
+  Announcements — see `specs/dashboard.md` → Out of scope / deferred for the full writeup.
 - **Teacher (staff) attendance** — distinct from student attendance; superadmin views it.
 - **Notifications engine** — email beyond auth (grades released, attendance alerts, announcements).
   The `guardian_email` field enables it; the engine itself is deferred.

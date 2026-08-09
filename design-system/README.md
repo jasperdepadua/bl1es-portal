@@ -37,13 +37,65 @@ Source of truth lives in [`src/styles/globals.css`](../src/styles/globals.css) a
   a pill/segmented-control look for a binary role/mode toggle (e.g. the login Student/Teacher
   switch) are all intentional, distinct-by-context choices. Don't invent a fourth treatment; pick
   whichever of these three matches the control's shape (list item vs. tab vs. binary switch).
-- **Modal/dialog pattern** (no shadcn Dialog primitive installed yet — plain Tailwind, see
-  `useModalBehavior` in `src/features/management/pages/SectionDetailPage.tsx`): `fixed inset-0 z-50`
-  wrapper, `bg-foreground/40` backdrop (click to close), `rounded-3xl border border-border bg-card
-  shadow-xl` panel, `role="dialog"` + `aria-modal="true"`. Behavior every new dialog must replicate:
-  focus the first control on open, trap Tab within the dialog, restore focus to the trigger on
-  close, lock background scroll, close on Escape. Reuse `useModalBehavior` rather than re-deriving
-  this per dialog.
+- **Modal/dialog pattern** (no shadcn Dialog primitive installed yet — plain Tailwind):
+  `fixed inset-0 z-50` wrapper, `bg-foreground/40` backdrop (click to close), `rounded-3xl border
+  border-border bg-card shadow-xl` panel, `role="dialog"` + `aria-modal="true"`. Behavior every new
+  dialog must replicate: focus the first control on open, trap Tab within the dialog, restore focus
+  to the trigger on close, lock background scroll, close on Escape. **Don't re-derive any of this
+  per dialog** — use the shared building blocks in `src/features/management/components/`:
+  - `useModalBehavior` (`src/hooks/use-modal-behavior.ts`) — the focus-trap/Escape/scroll-lock hook
+    itself.
+  - `DialogShell` (`dialog-shell.tsx`) — the backdrop + panel + header (title/description/close
+    button) chrome. `FormDialog` and `PickerDialog` both compose this; don't hand-roll the
+    header/backdrop/panel markup again for a third dialog shape — extend `DialogShell` or compose
+    it, the way those two do.
+  - `FormDialog` (`form-dialog.tsx`) — adds a `<form>` body + error slot + Cancel/Save footer on
+    top of `DialogShell`. Use for every create/edit form.
+  - `ConfirmDialog` (`confirm-dialog.tsx`) — title/description + Cancel/Confirm footer, no form.
+    Takes a `tone` prop: `'destructive'` (default — red confirm button) for irreversible/risky
+    actions (deactivate, unenroll); `'primary'` (blue confirm button) for confirmations that are
+    just an important state change, not a danger (e.g. "set as current school year"). Picking the
+    wrong tone reads as either scary-for-no-reason or not-serious-enough — match the actual stakes.
+  - `PickerDialog` (`picker-dialog.tsx`) — generic search + single-select list (e.g. picking a
+    teacher to assign, a student to enroll). Generic over `{ id, name }`.
+  - `FormSelect` (`form-dialog.tsx`) — **always use this for `<select>` elements, never a raw
+    `<select>`.** The native dropdown arrow (`appearance: auto`) doesn't match this app's lucide-icon
+    language and renders inconsistently across browsers; `FormSelect` replaces it with a properly
+    sized/positioned/colored `ChevronDown`, dims placeholder text like a real input does, and
+    forwards its ref for `react-hook-form`'s `register()` spread.
+  - `FORM_INPUT_CLASSNAME` / `FORM_FIELD_ERROR_CLASSNAME` (`form-dialog.tsx`) — the shared
+    text/number/date input styling and field-validation-error text styling. Import these instead of
+    re-declaring the class string per page — four forms already drifted (`px-3.5` vs `px-4`,
+    `text-xs` vs `text-sm` errors) before this was a shared constant.
+- **Icon pairs for state-toggle actions — pick from this set, don't invent a new pair per screen:**
+  - **Deactivate / Activate:** `Power` (deactivate) / `RotateCcw` (activate/reactivate). Reactivating
+    is a plain one-click action with no confirm dialog (it's the safe direction); deactivating goes
+    through `ConfirmDialog` with `tone="destructive"`.
+  - **Assign / Change:** when a relationship is unset (no adviser, no subject teacher), use a
+    **primary filled button** (`bg-primary text-primary-foreground`) with `UserPlus` and the label
+    "Assign X" — this is a real call-to-action flagging a gap that needs filling. Once set, switch to
+    a **neutral outline button** (`border-border bg-background`) with `RefreshCw` and the label
+    "Change X" — a routine, lower-stakes action. Apply this pair consistently everywhere an
+    assignment can be empty or filled (adviser, subject teacher, and any future "assign someone to
+    this slot" pattern) — don't leave one context flat (same style regardless of state) while
+    another distinguishes empty-vs-filled; that reads as arbitrary, not intentional.
+- **Empty-state template** (list pages with zero rows): centered `flex flex-col items-center` block,
+  `size-14 rounded-2xl bg-primary/10 text-primary` icon tile, `font-display text-lg font-extrabold`
+  heading, `text-sm text-muted-foreground` subtext, and — if the page has a header "Add X" button —
+  the **same button repeated inside the empty state** (primary-filled, `Plus` icon). Every list page
+  has the header button already; repeating it in the empty state isn't redundant, it's the more
+  discoverable one when there's nothing else on the page to look at.
+- **`font-display` (Baloo 2) and dashes don't mix.** A raw en-dash "–" or em-dash "—" renders
+  visibly too high relative to the surrounding text baseline in Baloo 2 at heading weight/size — a
+  font-specific glyph-metrics quirk, confirmed by rendering it and measuring. **Never put a literal
+  dash inside `font-display` text.** Use a middot "·" instead (it's metrics-designed to sit centered,
+  and renders correctly in both Baloo 2 and Nunito) — matching the separator already used for
+  compound labels like "Adviser · Grade 4–Mabini" (note: the *inner* hyphen there is fine because
+  that whole label renders in `font-sans`/Nunito, not `font-display`). If you need a literal string
+  dash for some reason, wrap it in `font-sans` explicitly rather than letting it inherit Baloo 2.
+- **`role="link"` rows activate on Enter only, not Space** (native `<a>` semantics — Space is
+  reserved for page-scroll). If a row-as-button interaction pattern is ever wanted instead, use
+  `role="button"` and accept Space too; don't mix the two semantics on one element.
 
 ## Still to define
 
@@ -61,10 +113,15 @@ Source of truth lives in [`src/styles/globals.css`](../src/styles/globals.css) a
   primitives with larger touch-friendly sizes, or formally bless the hand-rolled pattern and treat
   the primitives as not-yet-adopted) is still open. Revisit if/when a screen actually reaches for
   `Card`, or once enough hand-rolled duplication makes the primitives worth adopting.
-- **On-tint text contrast, app-wide.** `text-primary` on `bg-primary/10` improved from ~2.6:1 to
-  4.09:1 when `--primary` was darkened for the solid-fill fix above — clears the 3:1 floor (large
-  text/icons) but still short of 4.5:1 for small text. `text-muted-foreground` on `bg-muted` is
-  unaffected and still under AA. Both are used broadly (badges, avatar initials, subtitles) across
-  screens already shipped. Worth a dedicated pass (likely a `--primary-foreground`-on-tint token,
-  following the `--success-foreground` precedent) once the canonical-component question above is
-  settled, rather than patching combo-by-combo.
+- **On-tint text contrast — resolved for badges/avatars, still open for icons.** `text-primary` on
+  `bg-primary/10` is 4.08:1, `text-muted-foreground` on `bg-muted` is 3.18:1 — both clear the 3:1
+  floor for large text/icons but fail 4.5:1 for small text. Added two dedicated tokens in
+  `globals.css`, following the `--success-foreground` precedent: `--primary-foreground-tint`
+  (`#165db6`, 5.60:1 on `bg-primary/10`) and `--muted-badge-foreground` (`#6e6a5e`, 4.63:1 on
+  `bg-muted`). `Badge`'s `primary`/`muted` tones and `Initials` now use these instead of the plain
+  tokens — every badge and avatar-initial in the app inherits the fix automatically. Icon-tile
+  usages of `bg-primary/10 text-primary` (an icon, not text, inside the tint) are correctly left
+  alone — icons only need the 3:1 floor, which was already clear. **No dark-mode equivalents were
+  added** — dark mode isn't an active feature of this app (the `.dark` block in `globals.css` is
+  unused shadcn scaffold); add them if/when dark mode actually ships, rather than guessing values
+  now for a mode nothing renders in.

@@ -11,7 +11,9 @@ export function Initials({ name, className }: { name: string; className?: string
   return (
     <span
       className={cn(
-        'flex items-center justify-center rounded-full bg-primary/10 font-extrabold text-primary',
+        // text-primary-foreground-tint, not text-primary: see globals.css — plain text-primary
+        // on bg-primary/10 is only 4.08:1, short of AA at the small sizes this renders at.
+        'flex items-center justify-center rounded-full bg-primary/10 font-extrabold text-primary-foreground-tint',
         className,
       )}
     >
