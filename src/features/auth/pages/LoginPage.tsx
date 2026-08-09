@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import {
   User,
   Users,
@@ -19,6 +19,8 @@ import { cn } from '@/lib/utils'
 
 export default function LoginPage() {
   const navigate = useNavigate()
+  const location = useLocation()
+  const wasDeactivated = (location.state as { deactivated?: boolean } | null)?.deactivated === true
   const login = useLogin()
   const [role, setRole] = useState<LoginRole>('student')
   const [showPassword, setShowPassword] = useState(false)
@@ -190,7 +192,18 @@ export default function LoginPage() {
               </button>
             </div>
 
-            {login.isError && (
+            {wasDeactivated && (
+              <div
+                role="alert"
+                className="flex items-center gap-2 rounded-2xl border border-destructive/20 bg-destructive/10 px-4 py-3 text-sm font-semibold text-destructive"
+              >
+                <AlertCircle className="size-4 shrink-0" />
+                Your account has been deactivated. Contact the school office if you
+                believe this is a mistake.
+              </div>
+            )}
+
+            {!wasDeactivated && login.isError && (
               <div
                 role="alert"
                 className="flex items-center gap-2 rounded-2xl border border-destructive/20 bg-destructive/10 px-4 py-3 text-sm font-semibold text-destructive"

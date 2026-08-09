@@ -11,6 +11,8 @@ import {
   BookOpen,
   GraduationCap,
   CalendarRange,
+  Users,
+  Backpack,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useModalBehavior } from '@/hooks/use-modal-behavior'
@@ -24,6 +26,8 @@ const navItems = [
 ]
 
 const managementNavItems = [
+  { label: 'Teachers', href: '/management/teachers', icon: Users },
+  { label: 'Students', href: '/management/students', icon: Backpack },
   { label: 'Sections', href: '/management/sections', icon: Layers },
   { label: 'Subjects', href: '/management/subjects', icon: BookOpen },
   { label: 'Grade Levels', href: '/management/grade-levels', icon: GraduationCap },
