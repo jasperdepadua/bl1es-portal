@@ -71,11 +71,39 @@ Once `register-user` ships:
 
 ## Moving to production later
 
-When piloting with the real school:
+**Recommended: [Resend](https://resend.com).** Free tier is 3,000 emails/month (100/day), one
+verified domain, forever-free — comfortably enough for a single school's registration and
+password-reset traffic. It exposes an SMTP relay, so it's a drop-in swap for Mailtrap: same
+`nodemailer.createTransport({ host, port, auth: { user, pass } })` call in
+`supabase/functions/register-user/index.ts`, no code changes, only different secret values.
 
-1. Buy/verify a real sending domain with a production ESP (e.g. Resend — add DNS records for
-   SPF/DKIM, takes a few minutes).
-2. Swap the `MAILTRAP_*` secrets for the new provider's SMTP (or API) credentials via
-   `npx supabase secrets set`.
+**Why not a truly open-source / self-hosted mail server (e.g. Postfix)?** It's free, but not
+practical here: a self-hosted server starts with zero sender reputation and no SPF/DKIM/DMARC
+history, so mail to Gmail/Outlook/Yahoo is very likely to land in spam (or get rejected outright)
+until significant, ongoing reputation work is done. That cost isn't worth it for a small school's
+volume — a free-tier SaaS ESP with an established sending reputation is the better trade-off.
 
-The `register-user` Edge Function's code doesn't change — only the secrets it reads.
+**Alternative: [Brevo](https://www.brevo.com)** — 300 emails/day (9,000/month) free forever, also
+SMTP-relay compatible with nodemailer. Reach for this only if Resend's one-verified-domain limit
+is ever a blocker.
+
+### Steps to switch (once you have a real domain for the school)
+
+1. Sign up for Resend (or Brevo), verify the school's sending domain — add the SPF/DKIM DNS
+   records the provider gives you (takes a few minutes, propagation up to ~24h).
+2. Get SMTP credentials from the provider's dashboard (host/port/user/pass — same four values as
+   Mailtrap's, just from a different provider).
+3. Swap the secrets (same command shape as step 4 above, new values):
+   ```bash
+   npx supabase secrets set \
+     MAILTRAP_HOST=<new-host> \
+     MAILTRAP_PORT=<new-port> \
+     MAILTRAP_USER=<new-username> \
+     MAILTRAP_PASS=<new-password>
+   ```
+   (The secret names stay `MAILTRAP_*` even though the value comes from a different provider —
+   renaming them is optional cleanup, not required for this to work.)
+4. Redeploy is **not** required — secrets are read at request time, not baked into the deployed
+   function.
+
+The `register-user` Edge Function's code doesn't change at all — only the secret values it reads.
