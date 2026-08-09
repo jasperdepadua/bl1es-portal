@@ -21,6 +21,8 @@
     --color-sidebar-foreground: var(--sidebar-foreground);
     --color-sidebar: var(--sidebar);
     --color-success-foreground: var(--success-foreground);
+    --color-primary-foreground-tint: var(--primary-foreground-tint);
+    --color-muted-badge-foreground: var(--muted-badge-foreground);
     --color-chart-5: var(--chart-5);
     --color-chart-4: var(--chart-4);
     --color-chart-3: var(--chart-3);
@@ -80,6 +82,12 @@
   --chart-5: #a78bfa;
   /* Accessible status-text color (≥4.5:1 on white/card) — chart-4 is a fill, not tuned for text. */
   --success-foreground: #047857;
+  /* Accessible text color for the `primary` badge tone (bg-primary/10) — 5.60:1 vs. the
+     composited tint, same hue family as --primary. Plain text-primary is only 4.08:1 there. */
+  --primary-foreground-tint: #165db6;
+  /* Accessible text color for the `muted` badge tone (bg-muted) — 4.63:1 vs. --muted, same hue
+     family as --muted-foreground. Plain text-muted-foreground is only 3.18:1 there. */
+  --muted-badge-foreground: #6e6a5e;
   --radius: 1rem;
   --sidebar: #ffffff;
   --sidebar-foreground: #333a4d;

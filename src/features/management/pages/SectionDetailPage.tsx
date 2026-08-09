@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import {
   ArrowLeft,
@@ -12,13 +12,13 @@ import {
   UserMinus,
   UserPlus,
   Users,
-  X,
 } from 'lucide-react'
 import { PortalShell } from '@/layouts/portal-shell'
 import { cn } from '@/lib/utils'
-import { useModalBehavior } from '@/hooks/use-modal-behavior'
 import { Badge } from '../components/badge'
+import { ConfirmDialog } from '../components/confirm-dialog'
 import { Initials } from '../components/initials'
+import { PickerDialog } from '../components/picker-dialog'
 import { useSectionDetail } from '../hooks/use-section-detail'
 import { useSectionRoster } from '../hooks/use-section-roster'
 import { useEnrollableStudents } from '../hooks/use-enrollable-students'
@@ -42,182 +42,6 @@ const tabs: { key: TabKey; label: string; icon: typeof Users }[] = [
 
 // Stable empty-array reference so a still-loading roster doesn't defeat useMemo below.
 const EMPTY_ROSTER: RosterEntry[] = []
-
-function PickerDialog<T extends { id: string; name: string }>({
-  title,
-  description,
-  onClose,
-  isLoading,
-  options,
-  emptyMessage,
-  renderSubtitle,
-  onSelect,
-  isSelecting,
-  errorMessage,
-}: {
-  title: string
-  description: string
-  onClose: () => void
-  isLoading: boolean
-  options: T[]
-  emptyMessage: string
-  renderSubtitle?: (option: T) => string | null
-  onSelect: (option: T) => void
-  isSelecting: boolean
-  errorMessage?: string
-}) {
-  const [query, setQuery] = useState('')
-  const containerRef = useRef<HTMLDivElement>(null)
-  useModalBehavior(containerRef, onClose)
-
-  const filtered = useMemo(
-    () => options.filter((o) => o.name.toLowerCase().includes(query.trim().toLowerCase())),
-    [options, query],
-  )
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-foreground/40" onClick={onClose} aria-hidden />
-      <div
-        ref={containerRef}
-        role="dialog"
-        aria-modal="true"
-        aria-label={title}
-        className="relative flex max-h-[80vh] w-full max-w-md flex-col overflow-hidden rounded-3xl border border-border bg-card shadow-xl"
-      >
-        <div className="flex items-start justify-between gap-4 border-b border-border p-5">
-          <div>
-            <h3 className="font-display text-lg font-extrabold text-foreground">{title}</h3>
-            <p className="mt-1 text-sm font-medium text-muted-foreground">{description}</p>
-          </div>
-          <button
-            type="button"
-            onClick={onClose}
-            className="flex size-9 shrink-0 cursor-pointer items-center justify-center rounded-xl text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-            aria-label="Close dialog"
-          >
-            <X className="size-4" aria-hidden />
-          </button>
-        </div>
-
-        <div className="border-b border-border p-4">
-          <div className="relative">
-            <Search
-              className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
-              aria-hidden
-            />
-            <input
-              type="search"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search by name…"
-              className="h-11 w-full rounded-2xl border border-border bg-background pl-9 pr-3 text-sm font-medium text-foreground outline-none transition-all placeholder:text-muted-foreground focus:border-primary focus:ring-3 focus:ring-ring/30"
-              aria-label="Search by name"
-            />
-          </div>
-          {errorMessage && (
-            <p className="mt-3 text-sm font-semibold text-destructive">{errorMessage}</p>
-          )}
-        </div>
-
-        <div className="flex-1 overflow-y-auto p-2">
-          {isLoading ? (
-            <p className="px-3 py-8 text-center text-sm font-medium text-muted-foreground">
-              Loading…
-            </p>
-          ) : filtered.length === 0 ? (
-            <p className="px-3 py-8 text-center text-sm font-medium text-muted-foreground">
-              {options.length === 0 ? emptyMessage : 'No matches found.'}
-            </p>
-          ) : (
-            <ul className="flex flex-col gap-1">
-              {filtered.map((option) => {
-                const subtitle = renderSubtitle?.(option)
-                return (
-                  <li key={option.id}>
-                    <button
-                      type="button"
-                      disabled={isSelecting}
-                      onClick={() => onSelect(option)}
-                      className="flex w-full cursor-pointer items-center gap-3 rounded-2xl px-3 py-2.5 text-left outline-none transition-colors hover:bg-muted focus-visible:bg-muted focus-visible:ring-2 focus-visible:ring-ring/40 disabled:pointer-events-none disabled:opacity-50"
-                    >
-                      <Initials name={option.name} className="size-9 shrink-0 text-xs" />
-                      <div className="min-w-0 leading-tight">
-                        <p className="truncate text-sm font-bold text-foreground">{option.name}</p>
-                        {subtitle && (
-                          <p className="truncate text-xs font-semibold text-muted-foreground">
-                            {subtitle}
-                          </p>
-                        )}
-                      </div>
-                    </button>
-                  </li>
-                )
-              })}
-            </ul>
-          )}
-        </div>
-      </div>
-    </div>
-  )
-}
-
-function ConfirmDialog({
-  title,
-  description,
-  confirmLabel,
-  isPending,
-  errorMessage,
-  onCancel,
-  onConfirm,
-}: {
-  title: string
-  description: string
-  confirmLabel: string
-  isPending: boolean
-  errorMessage?: string
-  onCancel: () => void
-  onConfirm: () => void
-}) {
-  const containerRef = useRef<HTMLDivElement>(null)
-  useModalBehavior(containerRef, onCancel)
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-foreground/40" onClick={onCancel} aria-hidden />
-      <div
-        ref={containerRef}
-        role="dialog"
-        aria-modal="true"
-        aria-label={title}
-        className="relative w-full max-w-sm rounded-3xl border border-border bg-card p-6 shadow-xl"
-      >
-        <h3 className="font-display text-lg font-extrabold text-foreground">{title}</h3>
-        <p className="mt-2 text-sm font-medium text-muted-foreground">{description}</p>
-        {errorMessage && (
-          <p className="mt-3 text-sm font-semibold text-destructive">{errorMessage}</p>
-        )}
-        <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
-          <button
-            type="button"
-            onClick={onCancel}
-            className="cursor-pointer rounded-2xl border border-border bg-background px-4 py-2.5 text-sm font-bold text-foreground transition-colors hover:bg-muted"
-          >
-            Cancel
-          </button>
-          <button
-            type="button"
-            onClick={onConfirm}
-            disabled={isPending}
-            className="cursor-pointer rounded-2xl bg-destructive/10 px-4 py-2.5 text-sm font-extrabold text-destructive transition-colors hover:bg-destructive/20 disabled:pointer-events-none disabled:opacity-50"
-          >
-            {isPending ? 'Please wait…' : confirmLabel}
-          </button>
-        </div>
-      </div>
-    </div>
-  )
-}
 
 function SectionDetailContent({
   sectionId,
@@ -269,7 +93,7 @@ function SectionDetailContent({
 
   return (
     <PortalShell
-      title={`${section.gradeLevelName} – ${section.name}`}
+      title={`${section.gradeLevelName} · ${section.name}`}
       subtitle="Manage this section's roster, adviser, and subject teachers."
     >
       {/* Breadcrumb */}
@@ -555,14 +379,25 @@ function SectionDetailContent({
                     )}
                   </div>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => setAdviserDialogOpen(true)}
-                  className="inline-flex shrink-0 cursor-pointer items-center justify-center gap-2 rounded-2xl border border-border bg-background px-4 py-2.5 text-sm font-bold text-foreground transition-colors hover:border-primary/40 hover:bg-muted"
-                >
-                  <RefreshCw className="size-4" aria-hidden />
-                  {section.adviserId ? 'Change Adviser' : 'Assign Adviser'}
-                </button>
+                {section.adviserId ? (
+                  <button
+                    type="button"
+                    onClick={() => setAdviserDialogOpen(true)}
+                    className="inline-flex shrink-0 cursor-pointer items-center justify-center gap-2 rounded-2xl border border-border bg-background px-4 py-2.5 text-sm font-bold text-foreground transition-colors hover:border-primary/40 hover:bg-muted"
+                  >
+                    <RefreshCw className="size-4" aria-hidden />
+                    Change Adviser
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => setAdviserDialogOpen(true)}
+                    className="inline-flex shrink-0 cursor-pointer items-center justify-center gap-2 rounded-2xl bg-primary px-4 py-2.5 text-sm font-extrabold text-primary-foreground shadow-sm transition-colors hover:bg-primary/90"
+                  >
+                    <UserPlus className="size-4" aria-hidden />
+                    Assign Adviser
+                  </button>
+                )}
               </div>
             </div>
             <p className="px-1 text-sm font-medium text-muted-foreground">
@@ -615,8 +450,8 @@ function SectionDetailContent({
                       className="flex flex-col gap-3 px-5 py-4 sm:flex-row sm:items-center sm:justify-between"
                     >
                       <div className="flex items-center gap-3">
-                        <span className="flex size-10 items-center justify-center rounded-2xl bg-primary/10 text-primary">
-                          <BookOpen className="size-5" aria-hidden />
+                        <span className="flex size-9 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                          <BookOpen className="size-4" aria-hidden />
                         </span>
                         <div className="leading-tight">
                           <p className="text-sm font-extrabold text-foreground">

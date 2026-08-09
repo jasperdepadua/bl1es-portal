@@ -1,6 +1,17 @@
 import { useRef, useState, type ReactNode } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { LayoutDashboard, Settings, LogOut, Bell, Menu, X, Layers } from 'lucide-react'
+import {
+  LayoutDashboard,
+  Settings,
+  LogOut,
+  Bell,
+  Menu,
+  X,
+  Layers,
+  BookOpen,
+  GraduationCap,
+  CalendarRange,
+} from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useModalBehavior } from '@/hooks/use-modal-behavior'
 import { BrandLogo } from '@/components/brand-logo'
@@ -14,6 +25,9 @@ const navItems = [
 
 const managementNavItems = [
   { label: 'Sections', href: '/management/sections', icon: Layers },
+  { label: 'Subjects', href: '/management/subjects', icon: BookOpen },
+  { label: 'Grade Levels', href: '/management/grade-levels', icon: GraduationCap },
+  { label: 'School Years', href: '/management/school-years', icon: CalendarRange },
 ]
 
 const ROLE_LABELS = {

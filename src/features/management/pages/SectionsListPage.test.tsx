@@ -13,9 +13,15 @@ vi.mock('@/lib/supabase', () => ({ supabase: { auth: { onAuthStateChange, getSes
 vi.mock('@/features/auth/api/get-current-profile', () => ({ getCurrentProfile: vi.fn() }))
 vi.mock('@/features/auth/api/sign-out', () => ({ signOut: vi.fn() }))
 vi.mock('../api/list-sections', () => ({ listSections: vi.fn() }))
+vi.mock('../api/list-grade-levels', () => ({ listGradeLevels: vi.fn() }))
+vi.mock('../api/list-school-years', () => ({ listSchoolYears: vi.fn() }))
+vi.mock('../api/create-section', () => ({ createSection: vi.fn() }))
 
 import { AuthProvider } from '@/features/auth/hooks/use-auth'
 import { listSections } from '../api/list-sections'
+import { listGradeLevels } from '../api/list-grade-levels'
+import { listSchoolYears } from '../api/list-school-years'
+import { createSection } from '../api/create-section'
 import SectionsListPage from './SectionsListPage'
 
 function DetailProbe() {
@@ -42,6 +48,14 @@ function renderPage() {
 describe('SectionsListPage', () => {
   beforeEach(() => {
     vi.mocked(listSections).mockReset()
+    vi.mocked(listGradeLevels).mockReset().mockResolvedValue([
+      { id: 'gl-1', name: 'Kinder', sequence: 1, isActive: true },
+      { id: 'gl-2', name: 'Grade 1', sequence: 2, isActive: true },
+    ])
+    vi.mocked(listSchoolYears).mockReset().mockResolvedValue([
+      { id: 'sy-1', label: '2026-2027', startDate: '2026-06-01', endDate: '2027-03-31', isCurrent: true },
+    ])
+    vi.mocked(createSection).mockReset()
   })
 
   it('shows the empty state when there are no sections yet', async () => {
@@ -110,5 +124,53 @@ describe('SectionsListPage', () => {
     await waitFor(() =>
       expect(screen.getByText(/couldn.t load sections/i)).toBeInTheDocument(),
     )
+  })
+
+  it('opens the create dialog and submits a new section', async () => {
+    vi.mocked(listSections).mockResolvedValue([])
+    vi.mocked(createSection).mockResolvedValue(undefined)
+    const user = userEvent.setup()
+
+    renderPage()
+
+    await screen.findByText('No sections yet')
+    await user.click(screen.getAllByRole('button', { name: 'Add Section' })[0]!)
+
+    const dialog = await screen.findByRole('dialog', { name: 'Add Section' })
+    await user.type(screen.getByLabelText('Name'), 'Mabini')
+    await user.selectOptions(screen.getByLabelText('Grade Level'), 'gl-2')
+    await user.selectOptions(screen.getByLabelText('School Year'), 'sy-1')
+    await user.selectOptions(screen.getByLabelText(/Shift/), 'AM')
+
+    await user.click(
+      screen.getAllByRole('button', { name: 'Add Section' }).find((b) => dialog.contains(b))!,
+    )
+
+    await waitFor(() =>
+      expect(vi.mocked(createSection).mock.calls[0]?.[0]).toEqual({
+        name: 'Mabini',
+        gradeLevelId: 'gl-2',
+        schoolYearId: 'sy-1',
+        shift: 'AM',
+      }),
+    )
+  })
+
+  it('shows a validation error when required fields are left blank', async () => {
+    vi.mocked(listSections).mockResolvedValue([])
+    const user = userEvent.setup()
+
+    renderPage()
+
+    await screen.findByText('No sections yet')
+    await user.click(screen.getAllByRole('button', { name: 'Add Section' })[0]!)
+
+    const dialog = await screen.findByRole('dialog', { name: 'Add Section' })
+    await user.click(
+      screen.getAllByRole('button', { name: 'Add Section' }).find((b) => dialog.contains(b))!,
+    )
+
+    expect(await screen.findByText('Name is required')).toBeInTheDocument()
+    expect(createSection).not.toHaveBeenCalled()
   })
 })
