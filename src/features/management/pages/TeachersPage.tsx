@@ -1,15 +1,17 @@
-import { useEffect, useState } from 'react'
+import { Fragment, useEffect, useState } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { Pencil, Plus, Power, RotateCcw, Users } from 'lucide-react'
 import { PortalShell } from '@/layouts/portal-shell'
+import { InlineMutationError } from '@/components/inline-mutation-error'
 import { cn } from '@/lib/utils'
-import { Badge } from '../components/badge'
+import { Badge } from '@/components/badge'
 import { ConfirmDialog } from '../components/confirm-dialog'
 import { FormDialog, FORM_INPUT_CLASSNAME, FORM_FIELD_ERROR_CLASSNAME } from '../components/form-dialog'
 import { Initials } from '../components/initials'
 import { RegistrationSuccessDialog } from '../components/registration-success-dialog'
+import { ScrollableTable } from '../components/scrollable-table'
 import { useTeacherAccounts } from '../hooks/use-teacher-accounts'
 import { useRegisterTeacher } from '../hooks/use-register-user'
 import { useUpdateTeacher } from '../hooks/use-update-teacher'
@@ -291,7 +293,7 @@ export default function TeachersPage() {
           Loading teachers…
         </div>
       ) : isError ? (
-        <div className="rounded-3xl border border-border bg-card px-6 py-16 text-center text-sm font-medium text-destructive">
+        <div className="rounded-3xl border border-border bg-card px-6 py-16 text-center text-sm font-medium text-destructive-foreground">
           Couldn&apos;t load teachers. Try refreshing the page.
         </div>
       ) : !teachers || teachers.length === 0 ? (
@@ -316,7 +318,7 @@ export default function TeachersPage() {
         </div>
       ) : (
         <div className="overflow-hidden rounded-3xl border border-border bg-card">
-          <div className="overflow-x-auto">
+          <ScrollableTable>
             <table className="w-full min-w-[960px] border-collapse text-left">
               <thead>
                 <tr className="border-b border-border bg-muted/50">
@@ -336,8 +338,8 @@ export default function TeachersPage() {
               </thead>
               <tbody>
                 {teachers.map((teacher) => (
+                  <Fragment key={teacher.id}>
                   <tr
-                    key={teacher.id}
                     className="border-b border-border transition-colors last:border-0 hover:bg-muted/40"
                   >
                     <td className="px-5 py-3.5">
@@ -357,7 +359,7 @@ export default function TeachersPage() {
                     <td className="px-5 py-3.5">
                       {teacher.adviserOf.length === 0 ? (
                         <span className="text-sm font-medium text-muted-foreground">
-                          Not assigned yet
+                          Unassigned
                         </span>
                       ) : (
                         <div className="flex flex-wrap items-center gap-1.5">
@@ -372,7 +374,7 @@ export default function TeachersPage() {
                     <td className="px-5 py-3.5">
                       {teacher.subjectsTaught.length === 0 ? (
                         <span className="text-sm font-medium text-muted-foreground">
-                          Not assigned yet
+                          Unassigned
                         </span>
                       ) : (
                         <div className="flex flex-wrap items-center gap-1.5">
@@ -427,10 +429,20 @@ export default function TeachersPage() {
                       </div>
                     </td>
                   </tr>
+                  {reactivateMutation.isError && reactivateMutation.variables === teacher.id && (
+                    <tr className="border-b border-border last:border-0">
+                      <td colSpan={columns.length} className="px-5 pb-3.5">
+                        <div className="sticky left-0 mt-2 w-fit">
+                          <InlineMutationError message="Couldn't reactivate this teacher. Please try again." />
+                        </div>
+                      </td>
+                    </tr>
+                  )}
+                  </Fragment>
                 ))}
               </tbody>
             </table>
-          </div>
+          </ScrollableTable>
         </div>
       )}
 

@@ -56,7 +56,7 @@ export function PickerDialog<T extends { id: string; name: string }>({
           />
         </div>
         {errorMessage && (
-          <p className="mt-3 text-sm font-semibold text-destructive">{errorMessage}</p>
+          <p className="mt-3 text-sm font-semibold text-destructive-foreground">{errorMessage}</p>
         )}
       </div>
 

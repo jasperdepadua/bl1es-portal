@@ -256,4 +256,22 @@ describe('StudentsPage', () => {
     await waitFor(() => expect(vi.mocked(reactivateStudent).mock.calls[0]?.[0]).toBe('s-2'))
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
   })
+
+  it('shows an inline error below the row when reactivation fails', async () => {
+    vi.mocked(listStudentAccounts).mockResolvedValue({
+      hasCurrentSchoolYear: true,
+      students: studentRows,
+    })
+    vi.mocked(reactivateStudent).mockRejectedValue(new Error('network error'))
+    const user = userEvent.setup()
+
+    renderPage()
+
+    await screen.findByText('Bea Torres')
+    await user.click(screen.getByRole('button', { name: 'Activate Bea Torres' }))
+
+    expect(
+      await screen.findByText("Couldn't reactivate this student. Please try again."),
+    ).toBeInTheDocument()
+  })
 })

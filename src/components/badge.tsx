@@ -11,7 +11,7 @@ const tones: Record<BadgeTone, string> = {
   secondary: 'bg-secondary text-secondary-foreground',
   primary: 'bg-primary/10 text-primary-foreground-tint',
   success: 'bg-[color:var(--chart-4)]/15 text-success-foreground',
-  destructive: 'bg-destructive/10 text-destructive',
+  destructive: 'bg-destructive/10 text-destructive-foreground',
 }
 
 export function Badge({

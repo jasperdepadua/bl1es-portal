@@ -32,6 +32,7 @@
     --color-input: var(--input);
     --color-border: var(--border);
     --color-destructive: var(--destructive);
+    --color-destructive-foreground: var(--destructive-foreground);
     --color-accent-foreground: var(--accent-foreground);
     --color-accent: var(--accent);
     --color-muted-foreground: var(--muted-foreground);
@@ -72,6 +73,9 @@
   --accent: #ff6b6b;
   --accent-foreground: #ffffff;
   --destructive: #ef4444;
+  /* Accessible text color for destructive contexts (error messages, destructive badge/button label)
+     — --destructive itself is only ~3.76:1 on white, below the 4.5:1 floor for small text. */
+  --destructive-foreground: #d91313;
   --border: #efe6d8;
   --input: #efe6d8;
   --ring: #1b72de;

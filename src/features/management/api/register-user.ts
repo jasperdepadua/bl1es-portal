@@ -8,7 +8,11 @@ import { supabase } from '@/lib/supabase'
 async function resolveInvokeError(error: unknown): Promise<Error> {
   if (error instanceof FunctionsHttpError) {
     const body = await error.context.json().catch(() => null)
-    return new Error(typeof body?.error === 'string' ? body.error : error.message)
+    return new Error(
+      typeof body?.error === 'string'
+        ? body.error
+        : 'Something went wrong while sending the invite. Please try again.',
+    )
   }
   return error instanceof Error ? error : new Error('Registration failed')
 }

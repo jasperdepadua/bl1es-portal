@@ -66,7 +66,7 @@ describe('registerTeacher', () => {
     ).rejects.toThrow('That username/student number is already registered.')
   })
 
-  it('falls back to the generic FunctionsHttpError message when the body has no error field', async () => {
+  it('falls back to a friendly message when the body has no error field', async () => {
     invokeMock.mockResolvedValue({ data: null, error: httpError({}) })
 
     await expect(
@@ -76,7 +76,7 @@ describe('registerTeacher', () => {
         username: 'jdoe',
         contactEmail: 'jane.doe@example.com',
       }),
-    ).rejects.toThrow('Edge Function returned a non-2xx status code')
+    ).rejects.toThrow('Something went wrong while sending the invite. Please try again.')
   })
 
   it('throws when the function reports failure without a transport error', async () => {

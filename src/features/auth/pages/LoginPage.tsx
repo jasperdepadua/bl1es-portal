@@ -10,9 +10,9 @@ import {
   Sparkles,
   Star,
   BookOpen,
-  AlertCircle,
 } from 'lucide-react'
 import { BrandLogo } from '@/components/brand-logo'
+import { InlineMutationError } from '@/components/inline-mutation-error'
 import { useLogin } from '@/features/auth/hooks/use-login'
 import type { LoginRole } from '@/features/auth/api/resolve-login-email'
 import { cn } from '@/lib/utils'
@@ -38,7 +38,11 @@ export default function LoginPage() {
   return (
     <div className="flex min-h-screen flex-col lg:flex-row">
       {/* Illustration panel */}
-      <section className="relative hidden flex flex-col justify-between overflow-hidden bg-primary px-8 py-10 text-primary-foreground lg:flex lg:w-1/2 lg:px-12">
+      <section
+        className={cn(
+          'relative hidden flex-col justify-between overflow-hidden bg-primary px-8 py-10 text-primary-foreground lg:flex lg:w-1/2 lg:px-12',
+        )}
+      >
         <div className="absolute -left-16 -top-16 size-56 rounded-full bg-secondary/30" />
         <div className="absolute -bottom-20 right-10 size-64 rounded-full bg-accent/25" />
 
@@ -96,7 +100,7 @@ export default function LoginPage() {
             {(
               [
                 { key: 'student', label: 'Student', icon: User },
-                { key: 'teacher', label: 'Teacher', icon: Users },
+                { key: 'teacher', label: 'Teacher / Staff', icon: Users },
               ] as const
             ).map(({ key, label, icon: Icon }) => (
               <button
@@ -131,6 +135,7 @@ export default function LoginPage() {
                   id="username"
                   type="text"
                   required
+                  autoComplete="username"
                   value={identifier}
                   onChange={(e) => setIdentifier(e.target.value)}
                   placeholder={
@@ -154,6 +159,7 @@ export default function LoginPage() {
                   id="password"
                   type={showPassword ? 'text' : 'password'}
                   required
+                  autoComplete="current-password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Enter your password"
@@ -193,24 +199,11 @@ export default function LoginPage() {
             </div>
 
             {wasDeactivated && (
-              <div
-                role="alert"
-                className="flex items-center gap-2 rounded-2xl border border-destructive/20 bg-destructive/10 px-4 py-3 text-sm font-semibold text-destructive"
-              >
-                <AlertCircle className="size-4 shrink-0" />
-                Your account has been deactivated. Contact the school office if you
-                believe this is a mistake.
-              </div>
+              <InlineMutationError message="Your account has been deactivated. Contact the school office if you believe this is a mistake." />
             )}
 
             {!wasDeactivated && login.isError && (
-              <div
-                role="alert"
-                className="flex items-center gap-2 rounded-2xl border border-destructive/20 bg-destructive/10 px-4 py-3 text-sm font-semibold text-destructive"
-              >
-                <AlertCircle className="size-4 shrink-0" />
-                {login.error.message}
-              </div>
+              <InlineMutationError message={login.error.message} />
             )}
 
             <button

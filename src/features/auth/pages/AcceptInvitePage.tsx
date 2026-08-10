@@ -3,8 +3,9 @@ import { Link, useNavigate } from 'react-router-dom'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
-import { AlertCircle, ArrowRight, Eye, EyeOff, Lock } from 'lucide-react'
+import { ArrowRight, Eye, EyeOff, Lock } from 'lucide-react'
 import { BrandLogo } from '@/components/brand-logo'
+import { InlineMutationError } from '@/components/inline-mutation-error'
 import { useAuth } from '@/features/auth/hooks/use-auth'
 import { useSetInvitePassword } from '@/features/auth/hooks/use-set-invite-password'
 
@@ -83,7 +84,9 @@ function SetPasswordForm() {
           </button>
         </div>
         {errors.password && (
-          <p className="text-xs font-semibold text-destructive">{errors.password.message}</p>
+          <p className="text-xs font-semibold text-destructive-foreground">
+            {errors.password.message}
+          </p>
         )}
       </div>
 
@@ -111,20 +114,14 @@ function SetPasswordForm() {
           </button>
         </div>
         {errors.confirmPassword && (
-          <p className="text-xs font-semibold text-destructive">
+          <p className="text-xs font-semibold text-destructive-foreground">
             {errors.confirmPassword.message}
           </p>
         )}
       </div>
 
       {setInvitePassword.isError && (
-        <div
-          role="alert"
-          className="flex items-center gap-2 rounded-2xl border border-destructive/20 bg-destructive/10 px-4 py-3 text-sm font-semibold text-destructive"
-        >
-          <AlertCircle className="size-4 shrink-0" />
-          {setInvitePassword.error.message}
-        </div>
+        <InlineMutationError message={setInvitePassword.error.message} />
       )}
 
       <button
@@ -176,7 +173,7 @@ export default function AcceptInvitePage() {
                 to="/login"
                 className="mt-6 block text-center text-sm font-bold text-primary hover:underline"
               >
-                Back to Login
+                Back to sign in
               </Link>
             </>
           )}

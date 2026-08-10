@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { Fragment, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -14,8 +14,9 @@ import {
   Plus,
 } from 'lucide-react'
 import { PortalShell } from '@/layouts/portal-shell'
+import { InlineMutationError } from '@/components/inline-mutation-error'
 import { cn } from '@/lib/utils'
-import { Badge } from '../components/badge'
+import { Badge } from '@/components/badge'
 import { ConfirmDialog } from '../components/confirm-dialog'
 import { FormDialog, FORM_INPUT_CLASSNAME, FORM_FIELD_ERROR_CLASSNAME } from '../components/form-dialog'
 import { useSchoolYearDetail } from '../hooks/use-school-year-detail'
@@ -335,8 +336,8 @@ function SchoolYearDetailContent({
                 </thead>
                 <tbody>
                   {sortedPeriods.map((period) => (
+                    <Fragment key={period.id}>
                     <tr
-                      key={period.id}
                       className="border-b border-border last:border-0 transition-colors hover:bg-muted/40"
                     >
                       <td className="px-5 py-3.5 text-sm font-bold text-foreground">
@@ -394,6 +395,17 @@ function SchoolYearDetailContent({
                         </div>
                       </td>
                     </tr>
+                    {reactivatePeriodMutation.isError &&
+                      reactivatePeriodMutation.variables === period.id && (
+                        <tr className="border-b border-border last:border-0">
+                          <td colSpan={gradingPeriodColumns.length} className="px-5 pb-3.5">
+                            <div className="sticky left-0 mt-2 w-fit">
+                              <InlineMutationError message="Couldn't reactivate this grading period. Please try again." />
+                            </div>
+                          </td>
+                        </tr>
+                      )}
+                    </Fragment>
                   ))}
                 </tbody>
               </table>
@@ -406,7 +418,7 @@ function SchoolYearDetailContent({
       {setCurrentTarget && (
         <ConfirmDialog
           title="Set as Current School Year?"
-          description={`Set ${schoolYear.label} as the current school year? This will replace the current year for the whole school.`}
+          description={`This makes ${schoolYear.label} the current school year across the portal, replacing the one set now.`}
           confirmLabel="Set as Current"
           tone="primary"
           isPending={setCurrentMutation.isPending}
@@ -434,7 +446,7 @@ function SchoolYearDetailContent({
       {deactivateTarget && (
         <ConfirmDialog
           title="Deactivate Grading Period?"
-          description={`${deactivateTarget.label} will be marked inactive and hidden from new records. Historical records referencing it are preserved.`}
+          description={`${deactivateTarget.label} will be marked inactive and hidden from new records. Historical records referencing it are kept.`}
           confirmLabel="Deactivate"
           isPending={deactivatePeriodMutation.isPending}
           errorMessage={

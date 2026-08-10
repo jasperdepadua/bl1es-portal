@@ -9,7 +9,7 @@ export const FORM_INPUT_CLASSNAME =
   'h-11 w-full rounded-2xl border border-border bg-background px-4 text-sm font-medium text-foreground outline-none transition-all focus:border-primary focus:ring-3 focus:ring-ring/30'
 
 /** Shared field-validation-error text styling, matching this dialog's own error slot below. */
-export const FORM_FIELD_ERROR_CLASSNAME = 'text-sm font-semibold text-destructive'
+export const FORM_FIELD_ERROR_CLASSNAME = 'text-sm font-semibold text-destructive-foreground'
 
 /**
  * A `<select>` styled to match `FORM_INPUT_CLASSNAME`, with the native dropdown arrow replaced

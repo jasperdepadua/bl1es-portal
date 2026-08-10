@@ -19,6 +19,7 @@ import { useModalBehavior } from '@/hooks/use-modal-behavior'
 import { BrandLogo } from '@/components/brand-logo'
 import { useLogout } from '@/features/auth/hooks/use-logout'
 import { useProfile } from '@/features/auth/hooks/use-profile'
+import { ROLE_LABELS } from '@/features/auth/role-labels'
 
 const navItems = [
   { label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
@@ -33,12 +34,6 @@ const managementNavItems = [
   { label: 'Grade Levels', href: '/management/grade-levels', icon: GraduationCap },
   { label: 'School Years', href: '/management/school-years', icon: CalendarRange },
 ]
-
-const ROLE_LABELS = {
-  superadmin: 'Principal',
-  admin: 'Teacher',
-  normal: 'Student',
-} as const
 
 function isNavItemActive(pathname: string, href: string) {
   return href !== '#' && (pathname === href || pathname.startsWith(`${href}/`))
@@ -222,7 +217,7 @@ export function PortalShell({
           <button
             type="button"
             className="relative flex size-10 cursor-pointer items-center justify-center rounded-2xl border border-border bg-card text-foreground transition-colors hover:bg-muted"
-            aria-label="Notifications, 1 unread"
+            aria-label="Notifications"
           >
             <Bell className="size-5" />
             <span className="absolute right-2 top-2 size-2 rounded-full bg-accent" />

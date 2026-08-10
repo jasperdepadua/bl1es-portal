@@ -16,12 +16,14 @@ vi.mock('../api/list-grade-levels', () => ({ listGradeLevels: vi.fn() }))
 vi.mock('../api/create-grade-level', () => ({ createGradeLevel: vi.fn() }))
 vi.mock('../api/update-grade-level', () => ({ updateGradeLevel: vi.fn() }))
 vi.mock('../api/deactivate-grade-level', () => ({ deactivateGradeLevel: vi.fn() }))
+vi.mock('../api/reactivate-grade-level', () => ({ reactivateGradeLevel: vi.fn() }))
 vi.mock('../api/reorder-grade-levels', () => ({ reorderGradeLevels: vi.fn() }))
 
 import { AuthProvider } from '@/features/auth/hooks/use-auth'
 import { listGradeLevels } from '../api/list-grade-levels'
 import { createGradeLevel } from '../api/create-grade-level'
 import { deactivateGradeLevel } from '../api/deactivate-grade-level'
+import { reactivateGradeLevel } from '../api/reactivate-grade-level'
 import { reorderGradeLevels } from '../api/reorder-grade-levels'
 import GradeLevelsPage from './GradeLevelsPage'
 
@@ -49,6 +51,7 @@ describe('GradeLevelsPage', () => {
     vi.mocked(listGradeLevels).mockReset()
     vi.mocked(createGradeLevel).mockReset()
     vi.mocked(deactivateGradeLevel).mockReset()
+    vi.mocked(reactivateGradeLevel).mockReset()
     vi.mocked(reorderGradeLevels).mockReset()
   })
 
@@ -175,5 +178,35 @@ describe('GradeLevelsPage', () => {
     await user.click(within(confirmDialog).getByRole('button', { name: 'Deactivate' }))
 
     await waitFor(() => expect(vi.mocked(deactivateGradeLevel).mock.calls[0]?.[0]).toBe('gl-1'))
+  })
+
+  it('shows an inline error below the row when reactivation fails', async () => {
+    vi.mocked(listGradeLevels).mockResolvedValue(gradeLevelRows)
+    vi.mocked(reactivateGradeLevel).mockRejectedValue(new Error('network error'))
+    const user = userEvent.setup()
+
+    renderPage()
+
+    await screen.findByText('Grade 2')
+    await user.click(screen.getByRole('button', { name: 'Activate Grade 2' }))
+
+    expect(
+      await screen.findByText("Couldn't reactivate this grade level. Please try again."),
+    ).toBeInTheDocument()
+  })
+
+  it('shows an inline error above the table when reordering fails', async () => {
+    vi.mocked(listGradeLevels).mockResolvedValue(gradeLevelRows)
+    vi.mocked(reorderGradeLevels).mockRejectedValue(new Error('network error'))
+    const user = userEvent.setup()
+
+    renderPage()
+
+    await screen.findByText('Kinder')
+    await user.click(screen.getByRole('button', { name: 'Move Grade 1 up' }))
+
+    expect(
+      await screen.findByText("Couldn't reorder grade levels. Please try again."),
+    ).toBeInTheDocument()
   })
 })

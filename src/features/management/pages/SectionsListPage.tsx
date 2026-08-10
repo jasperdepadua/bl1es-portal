@@ -10,13 +10,14 @@ import { useSections } from '../hooks/use-sections'
 import { useGradeLevels } from '../hooks/use-grade-levels'
 import { useSchoolYears } from '../hooks/use-school-years'
 import { useCreateSection } from '../hooks/use-create-section'
-import { Badge } from '../components/badge'
+import { Badge } from '@/components/badge'
 import {
   FormDialog,
   FormSelect,
   FORM_INPUT_CLASSNAME,
   FORM_FIELD_ERROR_CLASSNAME,
 } from '../components/form-dialog'
+import { ScrollableTable } from '../components/scrollable-table'
 
 const columns = ['Name', 'Grade Level', 'School Year', 'Adviser', 'Enrolled', '']
 
@@ -160,7 +161,7 @@ export default function SectionsListPage() {
           Loading sections…
         </div>
       ) : isError ? (
-        <div className="rounded-3xl border border-border bg-card px-6 py-16 text-center text-sm font-medium text-destructive">
+        <div className="rounded-3xl border border-border bg-card px-6 py-16 text-center text-sm font-medium text-destructive-foreground">
           Couldn&apos;t load sections. Try refreshing the page.
         </div>
       ) : !sections || sections.length === 0 ? (
@@ -188,7 +189,7 @@ export default function SectionsListPage() {
         </div>
       ) : (
         <div className="overflow-hidden rounded-3xl border border-border bg-card">
-          <div className="overflow-x-auto">
+          <ScrollableTable>
             <table className="w-full min-w-[820px] border-collapse text-left">
               <thead>
                 <tr className="border-b border-border bg-muted/50">
@@ -256,7 +257,7 @@ export default function SectionsListPage() {
                 ))}
               </tbody>
             </table>
-          </div>
+          </ScrollableTable>
         </div>
       )}
 

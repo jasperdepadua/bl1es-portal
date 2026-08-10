@@ -13,6 +13,7 @@ import {
 } from 'lucide-react'
 import { PortalShell } from '@/layouts/portal-shell'
 import { useProfile } from '@/features/auth/hooks/use-profile'
+import { Badge } from '@/components/badge'
 import { cn } from '@/lib/utils'
 
 const stats = [
@@ -94,9 +95,10 @@ export default function DashboardPage() {
             </div>
             <button
               type="button"
-              className="inline-flex cursor-pointer items-center gap-2 self-start rounded-2xl bg-primary-foreground px-5 py-3 text-sm font-extrabold text-primary transition-transform hover:-translate-y-0.5"
+              disabled
+              className="inline-flex items-center gap-2 self-start rounded-2xl bg-primary-foreground px-5 py-3 text-sm font-extrabold text-primary disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50"
             >
-              View Schedule
+              View schedule
               <ArrowUpRight className="size-4" />
             </button>
           </div>
@@ -145,7 +147,8 @@ export default function DashboardPage() {
               </div>
               <button
                 type="button"
-                className="cursor-pointer text-sm font-bold text-primary hover:underline"
+                disabled
+                className="text-sm font-bold text-primary disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50"
               >
                 View all
               </button>
@@ -259,7 +262,8 @@ export default function DashboardPage() {
             </div>
             <button
               type="button"
-              className="cursor-pointer text-sm font-bold text-primary hover:underline"
+              disabled
+              className="text-sm font-bold text-primary disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50"
             >
               View all
             </button>
@@ -271,24 +275,16 @@ export default function DashboardPage() {
                 className="rounded-2xl border border-border bg-background p-4"
               >
                 <div className="flex items-center justify-between">
-                  <span className="rounded-full bg-muted px-2.5 py-1 text-xs font-bold text-muted-foreground">
-                    {task.subject}
-                  </span>
-                  <span
-                    className={cn(
-                      'rounded-full px-2.5 py-1 text-xs font-bold',
-                      task.urgent
-                        ? 'bg-accent/15 text-accent'
-                        : 'bg-secondary/50 text-secondary-foreground',
-                    )}
-                  >
+                  <Badge tone="muted">{task.subject}</Badge>
+                  <Badge tone={task.urgent ? 'destructive' : 'secondary'}>
                     {task.due}
-                  </span>
+                  </Badge>
                 </div>
                 <p className="mt-3 font-bold text-foreground">{task.title}</p>
                 <button
                   type="button"
-                  className="mt-4 w-full cursor-pointer rounded-xl border border-border bg-card py-2 text-sm font-bold text-foreground transition-colors hover:bg-muted"
+                  disabled
+                  className="mt-4 w-full rounded-xl border border-border bg-card py-2 text-sm font-bold text-foreground disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   Mark as done
                 </button>

@@ -39,7 +39,7 @@ export function ConfirmDialog({
         <h3 className="font-display text-lg font-extrabold text-foreground">{title}</h3>
         <p className="mt-2 text-sm font-medium text-muted-foreground">{description}</p>
         {errorMessage && (
-          <p className="mt-3 text-sm font-semibold text-destructive">{errorMessage}</p>
+          <p className="mt-3 text-sm font-semibold text-destructive-foreground">{errorMessage}</p>
         )}
         <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
           <button
@@ -56,7 +56,7 @@ export function ConfirmDialog({
             className={cn(
               'cursor-pointer rounded-2xl px-4 py-2.5 text-sm font-extrabold transition-colors disabled:pointer-events-none disabled:opacity-50',
               tone === 'destructive'
-                ? 'bg-destructive/10 text-destructive hover:bg-destructive/20'
+                ? 'bg-destructive/10 text-destructive-foreground hover:bg-destructive/20'
                 : 'bg-primary text-primary-foreground shadow-sm hover:bg-primary/90',
             )}
           >

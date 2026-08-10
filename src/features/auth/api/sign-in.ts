@@ -6,5 +6,9 @@ export async function signIn(identifier: string, password: string, role: LoginRo
     email: resolveLoginEmail(identifier, role),
     password,
   })
-  if (error) throw new Error('Incorrect login or password')
+  if (error) {
+    throw new Error(
+      role === 'student' ? 'Incorrect student number or password' : 'Incorrect username or password',
+    )
+  }
 }

@@ -17,6 +17,7 @@ vi.mock('../api/list-grade-levels', () => ({ listGradeLevels: vi.fn() }))
 vi.mock('../api/create-subject', () => ({ createSubject: vi.fn() }))
 vi.mock('../api/update-subject', () => ({ updateSubject: vi.fn() }))
 vi.mock('../api/deactivate-subject', () => ({ deactivateSubject: vi.fn() }))
+vi.mock('../api/reactivate-subject', () => ({ reactivateSubject: vi.fn() }))
 
 import { AuthProvider } from '@/features/auth/hooks/use-auth'
 import { listSubjects } from '../api/list-subjects'
@@ -24,6 +25,7 @@ import { listGradeLevels } from '../api/list-grade-levels'
 import { createSubject } from '../api/create-subject'
 import { updateSubject } from '../api/update-subject'
 import { deactivateSubject } from '../api/deactivate-subject'
+import { reactivateSubject } from '../api/reactivate-subject'
 import SubjectsPage from './SubjectsPage'
 
 function renderPage() {
@@ -70,6 +72,7 @@ describe('SubjectsPage', () => {
     vi.mocked(createSubject).mockReset()
     vi.mocked(updateSubject).mockReset()
     vi.mocked(deactivateSubject).mockReset()
+    vi.mocked(reactivateSubject).mockReset()
   })
 
   it('shows the empty state when there are no subjects yet', async () => {
@@ -196,5 +199,20 @@ describe('SubjectsPage', () => {
     await user.click(within(confirmDialog).getByRole('button', { name: 'Deactivate' }))
 
     await waitFor(() => expect(vi.mocked(deactivateSubject).mock.calls[0]?.[0]).toBe('subj-1'))
+  })
+
+  it('shows an inline error below the row when reactivation fails', async () => {
+    vi.mocked(listSubjects).mockResolvedValue(subjectRows)
+    vi.mocked(reactivateSubject).mockRejectedValue(new Error('network error'))
+    const user = userEvent.setup()
+
+    renderPage()
+
+    await screen.findByText('Filipino')
+    await user.click(screen.getByRole('button', { name: 'Activate Filipino' }))
+
+    expect(
+      await screen.findByText("Couldn't reactivate this subject. Please try again."),
+    ).toBeInTheDocument()
   })
 })
