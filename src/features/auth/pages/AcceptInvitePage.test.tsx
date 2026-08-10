@@ -58,7 +58,7 @@ describe('AcceptInvitePage', () => {
     expect(
       screen.getByText('Email link is invalid or has expired'),
     ).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'Back to Login' })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Back to sign in' })).toBeInTheDocument()
   })
 
   it('shows a generic invalid-link message when no session and no error param is present', () => {

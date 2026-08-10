@@ -18,6 +18,7 @@ vi.mock('../api/set-current-school-year', () => ({ setCurrentSchoolYear: vi.fn()
 vi.mock('../api/create-grading-period', () => ({ createGradingPeriod: vi.fn() }))
 vi.mock('../api/update-grading-period', () => ({ updateGradingPeriod: vi.fn() }))
 vi.mock('../api/deactivate-grading-period', () => ({ deactivateGradingPeriod: vi.fn() }))
+vi.mock('../api/reactivate-grading-period', () => ({ reactivateGradingPeriod: vi.fn() }))
 
 import { AuthProvider } from '@/features/auth/hooks/use-auth'
 import { getSchoolYearDetail } from '../api/get-school-year-detail'
@@ -25,6 +26,7 @@ import type { SchoolYearDetail } from '../api/get-school-year-detail'
 import { setCurrentSchoolYear } from '../api/set-current-school-year'
 import { createGradingPeriod } from '../api/create-grading-period'
 import { deactivateGradingPeriod } from '../api/deactivate-grading-period'
+import { reactivateGradingPeriod } from '../api/reactivate-grading-period'
 import SchoolYearDetailPage from './SchoolYearDetailPage'
 
 const baseSchoolYear: SchoolYearDetail = {
@@ -57,6 +59,7 @@ describe('SchoolYearDetailPage', () => {
     vi.mocked(setCurrentSchoolYear).mockReset()
     vi.mocked(createGradingPeriod).mockReset()
     vi.mocked(deactivateGradingPeriod).mockReset()
+    vi.mocked(reactivateGradingPeriod).mockReset()
   })
 
   it('shows a "school year not found" message when the year fails to load', async () => {
@@ -220,5 +223,31 @@ describe('SchoolYearDetailPage', () => {
     await waitFor(() =>
       expect(deactivateGradingPeriod).toHaveBeenCalledWith('gp-1', expect.anything()),
     )
+  })
+
+  it('shows an inline error below the row when reactivating a grading period fails', async () => {
+    vi.mocked(getSchoolYearDetail).mockResolvedValue({
+      ...baseSchoolYear,
+      gradingPeriods: [
+        {
+          id: 'gp-1',
+          label: 'Term 1',
+          sequence: 1,
+          startDate: null,
+          endDate: null,
+          isActive: false,
+        },
+      ],
+    })
+    vi.mocked(reactivateGradingPeriod).mockRejectedValue(new Error('network error'))
+    const user = userEvent.setup()
+
+    renderPage()
+
+    await user.click(await screen.findByRole('button', { name: /activate term 1/i }))
+
+    expect(
+      await screen.findByText("Couldn't reactivate this grading period. Please try again."),
+    ).toBeInTheDocument()
   })
 })

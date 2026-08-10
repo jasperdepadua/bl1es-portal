@@ -67,6 +67,11 @@ Source of truth lives in [`src/styles/globals.css`](../src/styles/globals.css) a
     text/number/date input styling and field-validation-error text styling. Import these instead of
     re-declaring the class string per page — four forms already drifted (`px-3.5` vs `px-4`,
     `text-xs` vs `text-sm` errors) before this was a shared constant.
+- **Inline mutation-error banner** (`src/components/inline-mutation-error.tsx`) — for surfacing a
+  failed mutation that has no dialog to show an error in (e.g. one-click reactivate/reorder actions,
+  which are deliberately confirm-free). Also used for the Login and Accept-Invite error banners. Not
+  a toast/notification system — just this one banner shape, rendered inline near the action that
+  failed.
 - **Icon pairs for state-toggle actions — pick from this set, don't invent a new pair per screen:**
   - **Deactivate / Activate:** `Power` (deactivate) / `RotateCcw` (activate/reactivate). Reactivating
     is a plain one-click action with no confirm dialog (it's the safe direction); deactivating goes
@@ -125,3 +130,12 @@ Source of truth lives in [`src/styles/globals.css`](../src/styles/globals.css) a
   added** — dark mode isn't an active feature of this app (the `.dark` block in `globals.css` is
   unused shadcn scaffold); add them if/when dark mode actually ships, rather than guessing values
   now for a mode nothing renders in.
+- **Destructive text included in the same fix.** `text-destructive` (`#ef4444`) is only ~3.76:1 on
+  white — below the 4.5:1 floor for small text, same failure mode as `text-primary`/
+  `text-muted-foreground` above. Added `--destructive-foreground` (`#d91313`, 5.18:1 on
+  `card`/`background`, 4.54:1 on the `bg-destructive/10` tint), following the same hue-preserving
+  precedent. `Badge`'s `destructive` tone, `FORM_FIELD_ERROR_CLASSNAME`, `ConfirmDialog`'s
+  destructive confirm button, and every hand-rolled error-message/banner text in the app now use
+  `text-destructive-foreground`. Icon-only and background-fill usages of `text-destructive`/
+  `bg-destructive`/`border-destructive` (icon tiles, hover-state icon color on row actions) are
+  correctly left alone — same icon/text distinction as above.

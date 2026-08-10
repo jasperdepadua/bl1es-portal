@@ -18,7 +18,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     supabase.auth
       .getSession()
       .then(({ data }) => setSession(data.session))
-      .catch(() => {}) // if session lookup fails, fall through to signed-out rather than hang
+      .catch((error) => {
+        // Fall through to signed-out rather than hang, but don't let a genuine network/storage
+        // failure vanish silently — getSession() resolves with { session: null } for the normal
+        // "no session" case, so a rejection here means something unexpected happened.
+        console.error('use-auth: session bootstrap failed', error)
+      })
       .finally(() => setIsLoading(false))
     const {
       data: { subscription },

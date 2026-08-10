@@ -1,7 +1,8 @@
 import { useId, useState } from 'react'
-import { UserCog, ShieldCheck, Camera, Check } from 'lucide-react'
+import { UserCog, ShieldCheck, Camera, Check, Info } from 'lucide-react'
 import { PortalShell } from '@/layouts/portal-shell'
 import { useProfile } from '@/features/auth/hooks/use-profile'
+import { ROLE_LABELS } from '@/features/auth/role-labels'
 import { cn } from '@/lib/utils'
 
 type SectionKey = 'profile' | 'security'
@@ -14,11 +15,13 @@ const sections: { key: SectionKey; label: string; icon: typeof UserCog }[] = [
 function Field({
   label,
   defaultValue,
+  placeholder,
   type = 'text',
   className,
 }: {
   label: string
-  defaultValue: string
+  defaultValue?: string
+  placeholder?: string
   type?: string
   className?: string
 }) {
@@ -32,6 +35,7 @@ function Field({
         id={id}
         type={type}
         defaultValue={defaultValue}
+        placeholder={placeholder}
         className="h-11 w-full rounded-2xl border border-border bg-background px-4 text-sm font-medium text-foreground outline-none transition-all focus:border-primary focus:ring-3 focus:ring-ring/30"
       />
     </div>
@@ -47,6 +51,7 @@ export default function SettingsPage() {
   const initials = profile
     ? `${profile.firstName.charAt(0)}${profile.lastName.charAt(0)}`.toUpperCase()
     : ''
+  const roleLabel = profile ? ROLE_LABELS[profile.role] : ''
 
   return (
     <PortalShell
@@ -82,11 +87,11 @@ export default function SettingsPage() {
         <div className="flex flex-col gap-6">
           {active === 'profile' && (
             <section className="rounded-3xl border border-border bg-card p-6">
-              <h3 className="font-display text-lg font-extrabold text-foreground">
+              <h2 className="font-display text-lg font-extrabold text-foreground">
                 Profile
-              </h3>
+              </h2>
               <p className="text-sm font-medium text-muted-foreground">
-                This information is visible to your class and school staff.
+                This information is visible to school staff.
               </p>
 
               <div className="mt-6 flex flex-col items-center gap-4 sm:flex-row">
@@ -96,7 +101,9 @@ export default function SettingsPage() {
                   </span>
                   <button
                     type="button"
-                    className="absolute -bottom-1 -right-1 flex size-10 cursor-pointer items-center justify-center rounded-xl border border-border bg-card text-foreground shadow-sm hover:bg-muted"
+                    disabled
+                    title="Changing your photo isn't available yet"
+                    className="absolute -bottom-1 -right-1 flex size-10 items-center justify-center rounded-xl border border-border bg-card text-foreground shadow-sm disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-60"
                     aria-label="Change photo"
                   >
                     <Camera className="size-4" />
@@ -106,17 +113,25 @@ export default function SettingsPage() {
                   <p className="font-display text-lg font-extrabold text-foreground">
                     {displayName}
                   </p>
-                  <p className="text-sm font-medium text-muted-foreground">
-                    Adviser · Grade 4–Mabini
-                  </p>
+                  <p className="text-sm font-medium text-muted-foreground">{roleLabel}</p>
                 </div>
               </div>
 
               <div className="mt-6 grid gap-4 sm:grid-cols-2">
-                <Field label="First Name" defaultValue="Maria" />
-                <Field label="Last Name" defaultValue="Reyes" />
-                <Field label="Email" defaultValue="m.reyes@bl1es.edu.ph" type="email" />
-                <Field label="Contact Number" defaultValue="+63 917 555 0142" />
+                <Field
+                  key={`first-name-${profile?.firstName ?? ''}`}
+                  label="First Name"
+                  defaultValue={profile?.firstName}
+                  placeholder="Not set yet"
+                />
+                <Field
+                  key={`last-name-${profile?.lastName ?? ''}`}
+                  label="Last Name"
+                  defaultValue={profile?.lastName}
+                  placeholder="Not set yet"
+                />
+                <Field label="Email" placeholder="Not set yet" type="email" />
+                <Field label="Contact Number" placeholder="Not set yet" />
               </div>
 
               <div className="mt-4 flex flex-col gap-1.5">
@@ -126,7 +141,7 @@ export default function SettingsPage() {
                 <textarea
                   id={aboutId}
                   rows={3}
-                  defaultValue="I love making learning fun and helping every child shine. I'm the adviser for Grade 4–Mabini."
+                  placeholder="Not set yet"
                   className="w-full rounded-2xl border border-border bg-background px-4 py-3 text-sm font-medium text-foreground outline-none transition-all focus:border-primary focus:ring-3 focus:ring-ring/30"
                 />
               </div>
@@ -135,9 +150,9 @@ export default function SettingsPage() {
 
           {active === 'security' && (
             <section className="rounded-3xl border border-border bg-card p-6">
-              <h3 className="font-display text-lg font-extrabold text-foreground">
+              <h2 className="font-display text-lg font-extrabold text-foreground">
                 Security
-              </h3>
+              </h2>
               <p className="text-sm font-medium text-muted-foreground">
                 Update your password.
               </p>
@@ -154,11 +169,23 @@ export default function SettingsPage() {
             </section>
           )}
 
+          {/* Editing-not-available notice */}
+          <div className="flex items-center gap-3 rounded-2xl border border-border bg-card p-4">
+            <span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-muted text-muted-foreground">
+              <Info className="size-5" />
+            </span>
+            <p className="text-sm font-medium text-muted-foreground">
+              Editing your profile isn&apos;t available yet.
+            </p>
+          </div>
+
           {/* Save bar */}
           <div className="flex flex-col-reverse items-stretch justify-end gap-3 sm:flex-row sm:items-center">
             <button
               type="button"
-              className="cursor-pointer rounded-2xl border border-border bg-card px-5 py-3 text-sm font-bold text-foreground transition-colors hover:bg-muted"
+              disabled
+              title="Not available yet"
+              className="rounded-2xl border border-border bg-card px-5 py-3 text-sm font-bold text-foreground disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-60"
             >
               Cancel
             </button>
@@ -169,7 +196,7 @@ export default function SettingsPage() {
               className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-2xl bg-primary px-6 py-3 text-sm font-extrabold text-primary-foreground shadow-sm transition-transform hover:-translate-y-0.5 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-60"
             >
               <Check className="size-4" />
-              Save changes
+              Save Changes
             </button>
           </div>
         </div>

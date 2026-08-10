@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { Fragment, useState } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
@@ -12,10 +12,12 @@ import {
   RotateCcw,
 } from 'lucide-react'
 import { PortalShell } from '@/layouts/portal-shell'
+import { InlineMutationError } from '@/components/inline-mutation-error'
 import { cn } from '@/lib/utils'
-import { Badge } from '../components/badge'
+import { Badge } from '@/components/badge'
 import { ConfirmDialog } from '../components/confirm-dialog'
 import { FormDialog, FORM_INPUT_CLASSNAME, FORM_FIELD_ERROR_CLASSNAME } from '../components/form-dialog'
+import { ScrollableTable } from '../components/scrollable-table'
 import { useGradeLevels } from '../hooks/use-grade-levels'
 import { useCreateGradeLevel } from '../hooks/use-create-grade-level'
 import { useUpdateGradeLevel } from '../hooks/use-update-grade-level'
@@ -176,7 +178,7 @@ export default function GradeLevelsPage() {
           Loading grade levels…
         </div>
       ) : isError ? (
-        <div className="rounded-3xl border border-border bg-card px-6 py-16 text-center text-sm font-medium text-destructive">
+        <div className="rounded-3xl border border-border bg-card px-6 py-16 text-center text-sm font-medium text-destructive-foreground">
           Couldn&apos;t load grade levels. Try refreshing the page.
         </div>
       ) : sorted.length === 0 ? (
@@ -202,116 +204,130 @@ export default function GradeLevelsPage() {
           </button>
         </div>
       ) : (
-        <div className="overflow-hidden rounded-3xl border border-border bg-card">
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[560px] border-collapse text-left">
-              <thead>
-                <tr className="border-b border-border bg-muted/50">
-                  {columns.map((h, i) => (
-                    <th
-                      key={h || i}
-                      scope="col"
-                      className={cn(
-                        'px-5 py-3.5 text-xs font-extrabold uppercase tracking-wide text-muted-foreground',
-                        i === columns.length - 1 && 'text-right',
-                      )}
-                    >
-                      {h}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {sorted.map((gradeLevel, index) => (
-                  <tr
-                    key={gradeLevel.id}
-                    className="border-b border-border transition-colors last:border-0 hover:bg-muted/40"
-                  >
-                    <td className="px-5 py-3.5">
-                      <div className="flex items-center gap-3">
-                        <span className="flex size-9 items-center justify-center rounded-xl bg-primary/10 text-primary">
-                          <GraduationCap className="size-4" aria-hidden />
-                        </span>
-                        <span className="text-sm font-bold text-foreground">
-                          {gradeLevel.name}
-                        </span>
-                      </div>
-                    </td>
-                    <td className="px-5 py-3.5">
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm font-bold text-foreground">
-                          {gradeLevel.sequence}
-                        </span>
-                        <div className="flex items-center gap-1">
-                          <button
-                            type="button"
-                            onClick={() => moveGradeLevel(index, 'up')}
-                            disabled={index === 0 || reorderMutation.isPending}
-                            aria-label={`Move ${gradeLevel.name} up`}
-                            title="Move up"
-                            className="inline-flex size-7 cursor-pointer items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground disabled:pointer-events-none disabled:opacity-40"
-                          >
-                            <ArrowUp className="size-3.5" aria-hidden />
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => moveGradeLevel(index, 'down')}
-                            disabled={index === sorted.length - 1 || reorderMutation.isPending}
-                            aria-label={`Move ${gradeLevel.name} down`}
-                            title="Move down"
-                            className="inline-flex size-7 cursor-pointer items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground disabled:pointer-events-none disabled:opacity-40"
-                          >
-                            <ArrowDown className="size-3.5" aria-hidden />
-                          </button>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-5 py-3.5">
-                      {gradeLevel.isActive ? (
-                        <Badge tone="success">Active</Badge>
-                      ) : (
-                        <Badge tone="muted">Inactive</Badge>
-                      )}
-                    </td>
-                    <td className="px-5 py-3.5 text-right">
-                      <div className="flex items-center justify-end gap-1">
-                        <button
-                          type="button"
-                          onClick={() => setFormDialog({ mode: 'edit', gradeLevel })}
-                          className="inline-flex size-9 cursor-pointer items-center justify-center rounded-xl text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-                          aria-label={`Edit ${gradeLevel.name}`}
-                          title="Edit"
-                        >
-                          <Pencil className="size-4" aria-hidden />
-                        </button>
-                        {gradeLevel.isActive ? (
-                          <button
-                            type="button"
-                            onClick={() => setDeactivateTarget(gradeLevel)}
-                            className="inline-flex size-9 cursor-pointer items-center justify-center rounded-xl text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
-                            aria-label={`Deactivate ${gradeLevel.name}`}
-                            title="Deactivate"
-                          >
-                            <Power className="size-4" aria-hidden />
-                          </button>
-                        ) : (
-                          <button
-                            type="button"
-                            onClick={() => reactivateMutation.mutate(gradeLevel.id)}
-                            disabled={reactivateMutation.isPending}
-                            className="inline-flex size-9 cursor-pointer items-center justify-center rounded-xl text-muted-foreground transition-colors hover:bg-primary/10 hover:text-primary disabled:pointer-events-none disabled:opacity-50"
-                            aria-label={`Activate ${gradeLevel.name}`}
-                            title="Activate"
-                          >
-                            <RotateCcw className="size-4" aria-hidden />
-                          </button>
+        <div className="flex flex-col gap-4">
+          {reorderMutation.isError && (
+            <InlineMutationError message="Couldn't reorder grade levels. Please try again." />
+          )}
+          <div className="overflow-hidden rounded-3xl border border-border bg-card">
+            <ScrollableTable>
+              <table className="w-full min-w-[560px] border-collapse text-left">
+                <thead>
+                  <tr className="border-b border-border bg-muted/50">
+                    {columns.map((h, i) => (
+                      <th
+                        key={h || i}
+                        scope="col"
+                        className={cn(
+                          'px-5 py-3.5 text-xs font-extrabold uppercase tracking-wide text-muted-foreground',
+                          i === columns.length - 1 && 'text-right',
                         )}
-                      </div>
-                    </td>
+                      >
+                        {h}
+                      </th>
+                    ))}
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {sorted.map((gradeLevel, index) => (
+                    <Fragment key={gradeLevel.id}>
+                      <tr className="border-b border-border transition-colors last:border-0 hover:bg-muted/40">
+                        <td className="px-5 py-3.5">
+                          <div className="flex items-center gap-3">
+                            <span className="flex size-9 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                              <GraduationCap className="size-4" aria-hidden />
+                            </span>
+                            <span className="text-sm font-bold text-foreground">
+                              {gradeLevel.name}
+                            </span>
+                          </div>
+                        </td>
+                        <td className="px-5 py-3.5">
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm font-bold text-foreground">
+                              {gradeLevel.sequence}
+                            </span>
+                            <div className="flex items-center gap-1">
+                              <button
+                                type="button"
+                                onClick={() => moveGradeLevel(index, 'up')}
+                                disabled={index === 0 || reorderMutation.isPending}
+                                aria-label={`Move ${gradeLevel.name} up`}
+                                title="Move up"
+                                className="inline-flex size-7 cursor-pointer items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground disabled:pointer-events-none disabled:opacity-40"
+                              >
+                                <ArrowUp className="size-3.5" aria-hidden />
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => moveGradeLevel(index, 'down')}
+                                disabled={index === sorted.length - 1 || reorderMutation.isPending}
+                                aria-label={`Move ${gradeLevel.name} down`}
+                                title="Move down"
+                                className="inline-flex size-7 cursor-pointer items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground disabled:pointer-events-none disabled:opacity-40"
+                              >
+                                <ArrowDown className="size-3.5" aria-hidden />
+                              </button>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="px-5 py-3.5">
+                          {gradeLevel.isActive ? (
+                            <Badge tone="success">Active</Badge>
+                          ) : (
+                            <Badge tone="muted">Inactive</Badge>
+                          )}
+                        </td>
+                        <td className="px-5 py-3.5 text-right">
+                          <div className="flex items-center justify-end gap-1">
+                            <button
+                              type="button"
+                              onClick={() => setFormDialog({ mode: 'edit', gradeLevel })}
+                              className="inline-flex size-9 cursor-pointer items-center justify-center rounded-xl text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                              aria-label={`Edit ${gradeLevel.name}`}
+                              title="Edit"
+                            >
+                              <Pencil className="size-4" aria-hidden />
+                            </button>
+                            {gradeLevel.isActive ? (
+                              <button
+                                type="button"
+                                onClick={() => setDeactivateTarget(gradeLevel)}
+                                className="inline-flex size-9 cursor-pointer items-center justify-center rounded-xl text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
+                                aria-label={`Deactivate ${gradeLevel.name}`}
+                                title="Deactivate"
+                              >
+                                <Power className="size-4" aria-hidden />
+                              </button>
+                            ) : (
+                              <button
+                                type="button"
+                                onClick={() => reactivateMutation.mutate(gradeLevel.id)}
+                                disabled={reactivateMutation.isPending}
+                                className="inline-flex size-9 cursor-pointer items-center justify-center rounded-xl text-muted-foreground transition-colors hover:bg-primary/10 hover:text-primary disabled:pointer-events-none disabled:opacity-50"
+                                aria-label={`Activate ${gradeLevel.name}`}
+                                title="Activate"
+                              >
+                                <RotateCcw className="size-4" aria-hidden />
+                              </button>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                      {reactivateMutation.isError &&
+                        reactivateMutation.variables === gradeLevel.id && (
+                          <tr className="border-b border-border last:border-0">
+                            <td colSpan={columns.length} className="px-5 pb-3.5">
+                              <div className="sticky left-0 mt-2 w-fit">
+                                <InlineMutationError message="Couldn't reactivate this grade level. Please try again." />
+                              </div>
+                            </td>
+                          </tr>
+                        )}
+                    </Fragment>
+                  ))}
+                </tbody>
+              </table>
+            </ScrollableTable>
           </div>
         </div>
       )}
@@ -328,7 +344,7 @@ export default function GradeLevelsPage() {
       {deactivateTarget && (
         <ConfirmDialog
           title="Deactivate Grade Level?"
-          description={`${deactivateTarget.name} won't appear in new section or subject assignments. You can reactivate it anytime from this list.`}
+          description={`${deactivateTarget.name} won't appear in new section or subject assignments. Existing assignments are kept.`}
           confirmLabel="Deactivate"
           isPending={deactivateMutation.isPending}
           errorMessage={

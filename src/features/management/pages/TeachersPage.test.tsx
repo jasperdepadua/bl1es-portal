@@ -95,7 +95,7 @@ describe('TeachersPage', () => {
 
     expect(screen.getByText('Ben Cruz')).toBeInTheDocument()
     expect(screen.getByText('Inactive')).toBeInTheDocument()
-    expect(screen.getAllByText('Not assigned yet')).toHaveLength(2)
+    expect(screen.getAllByText('Unassigned')).toHaveLength(2)
   })
 
   it("shows an error message when teachers fail to load", async () => {
@@ -240,5 +240,20 @@ describe('TeachersPage', () => {
 
     await waitFor(() => expect(vi.mocked(reactivateTeacher).mock.calls[0]?.[0]).toBe('t-2'))
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+  })
+
+  it('shows an inline error below the row when reactivation fails', async () => {
+    vi.mocked(listTeacherAccounts).mockResolvedValue(teacherRows)
+    vi.mocked(reactivateTeacher).mockRejectedValue(new Error('network error'))
+    const user = userEvent.setup()
+
+    renderPage()
+
+    await screen.findByText('Ben Cruz')
+    await user.click(screen.getByRole('button', { name: 'Activate Ben Cruz' }))
+
+    expect(
+      await screen.findByText("Couldn't reactivate this teacher. Please try again."),
+    ).toBeInTheDocument()
   })
 })

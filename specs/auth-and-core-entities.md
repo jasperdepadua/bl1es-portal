@@ -199,5 +199,5 @@ UI already renders initials, e.g. "MR").
 
 - **Login form:** the Student/Teacher toggle now drives which synth-email domain is used (`role`
   is passed through `useLogin` → `signIn` → `resolveLoginEmail`, replacing the old identifier-shape
-  sniffing). Labels corrected: "Student ID" for student, "Username" for staff (covers both admin
+  sniffing). Labels corrected: "Student Number" for student, "Username" for staff (covers both admin
   and superadmin, who share the staff domain).

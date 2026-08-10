@@ -18,13 +18,13 @@ describe('setInvitePassword', () => {
     expect(updateUser).toHaveBeenCalledWith({ password: 'a-strong-password' })
   })
 
-  it('throws with the Supabase error message on failure', async () => {
+  it('throws a friendly message on failure, not the raw Supabase Auth error', async () => {
     updateUser.mockResolvedValue({
       error: { message: 'Password should be at least 8 characters' },
     })
 
     await expect(setInvitePassword('short')).rejects.toThrow(
-      'Password should be at least 8 characters',
+      "Couldn't set your password. Please try again, or request a new invite if this link has expired.",
     )
   })
 })

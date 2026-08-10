@@ -15,10 +15,11 @@ import {
 } from 'lucide-react'
 import { PortalShell } from '@/layouts/portal-shell'
 import { cn } from '@/lib/utils'
-import { Badge } from '../components/badge'
+import { Badge } from '@/components/badge'
 import { ConfirmDialog } from '../components/confirm-dialog'
 import { Initials } from '../components/initials'
 import { PickerDialog } from '../components/picker-dialog'
+import { ScrollableTable } from '../components/scrollable-table'
 import { useSectionDetail } from '../hooks/use-section-detail'
 import { useSectionRoster } from '../hooks/use-section-roster'
 import { useEnrollableStudents } from '../hooks/use-enrollable-students'
@@ -244,7 +245,7 @@ function SectionDetailContent({
                 Loading roster…
               </div>
             ) : rosterQuery.isError ? (
-              <div className="rounded-3xl border border-border bg-card px-6 py-16 text-center text-sm font-medium text-destructive">
+              <div className="rounded-3xl border border-border bg-card px-6 py-16 text-center text-sm font-medium text-destructive-foreground">
                 Couldn&apos;t load the roster. Try refreshing the page.
               </div>
             ) : roster.length === 0 ? (
@@ -271,7 +272,7 @@ function SectionDetailContent({
               </div>
             ) : (
               <div className="overflow-hidden rounded-3xl border border-border bg-card">
-                <div className="overflow-x-auto">
+                <ScrollableTable>
                   <table className="w-full min-w-[720px] border-collapse text-left">
                     <thead>
                       <tr className="border-b border-border bg-muted/50">
@@ -343,7 +344,7 @@ function SectionDetailContent({
                       )}
                     </tbody>
                   </table>
-                </div>
+                </ScrollableTable>
               </div>
             )}
           </section>
@@ -423,7 +424,7 @@ function SectionDetailContent({
                 Loading subjects…
               </div>
             ) : subjectTeachersQuery.isError ? (
-              <div className="rounded-3xl border border-border bg-card px-6 py-16 text-center text-sm font-medium text-destructive">
+              <div className="rounded-3xl border border-border bg-card px-6 py-16 text-center text-sm font-medium text-destructive-foreground">
                 Couldn&apos;t load subject teachers. Try refreshing the page.
               </div>
             ) : subjectTeachers.length === 0 ? (
@@ -560,7 +561,7 @@ function SectionDetailContent({
       {unenrollTarget && (
         <ConfirmDialog
           title="Unenroll Student?"
-          description={`${unenrollTarget.studentName} will be removed from this section's roster. This can't be undone.`}
+          description={`${unenrollTarget.studentName} will be removed from this section's roster for ${section.schoolYearLabel}. You can enroll them again if needed.`}
           confirmLabel="Unenroll"
           isPending={unenrollMutation.isPending}
           errorMessage={
